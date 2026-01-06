@@ -58,5 +58,14 @@
       "isPublic": false
     }
   },
-  "proxy": "http://localhost:4000"
+  "proxy": "http://localhost:4000",
+  "description": "Youtube and x clone in one",
+  "main": "index.js",
+  "keywords": [
+    "react",
+    "javascript",
+    "backend"
+  ],
+  "author": "Alankrit Dabral",
+  "license": "ISC"
 }
