@@ -7,6 +7,7 @@ v2.config({
   api_secret: "process.env.CLOUDINARY_API_SECRET",
 });
 
+
 const uploadOnCloudinary = async (filename) => {
   try {
     if (!filename) return null;
