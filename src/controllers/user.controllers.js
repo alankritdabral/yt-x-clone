@@ -53,9 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   //console.log(req.files);
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
   //const coverImageLocalPath = req.files?.coverImage[0]?.path;
-
   let coverImageLocalPath;
   if (
     req.files &&
@@ -64,6 +62,8 @@ const registerUser = asyncHandler(async (req, res) => {
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
+
+  const avatarLocalPath = req.files?.avatar[0]?.path;
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
@@ -470,4 +470,5 @@ export {
   updateUserAvatar,
   updateUserCoverImage,
   getUserChannelProfile,
+  getWatchHistory,
 };
