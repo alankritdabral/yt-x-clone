@@ -5,7 +5,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/Asynchandler.js";
 import { Video } from "../models/video.models.js";
 
-export const getVideoId = async (videoObjectId) => {
+/* ===========================
+   Utils
+=========================== */
+
+const getValidVideoId = async (videoObjectId) => {
   if (!videoObjectId) {
     throw new ApiError(400, "videoId is required");
   }
@@ -16,30 +20,35 @@ export const getVideoId = async (videoObjectId) => {
 
   const videoId = new mongoose.Types.ObjectId(videoObjectId);
 
-  return { videoId };
+  const videoExists = await Video.exists({ _id: videoId });
+  if (!videoExists) {
+    throw new ApiError(404, "Video not found");
+  }
+
+  return videoId;
 };
+
+/* ===========================
+   Get Video Comments
+=========================== */
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoObjectId } = req.params;
-  const { videoId } = await getVideoId(videoObjectId);
+  const videoId = await getValidVideoId(videoObjectId);
 
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.min(Number(req.query.limit) || 10, 50);
   const skip = (page - 1) * limit;
 
-  const comments = await Video.aggregate([
+  const result = await Comment.aggregate([
     {
       $match: {
-        _id: videoId,
+        video: videoId,
       },
     },
     {
-      $lookup: {
-        from: "comments",
-        localField: "_id",
-        foreignField: "video",
-        as: "comments",
-        pipeline: [
+      $facet: {
+        comments: [
           { $sort: { createdAt: -1 } },
           { $skip: skip },
           { $limit: limit },
@@ -62,26 +71,35 @@ const getVideoComments = asyncHandler(async (req, res) => {
           },
           { $addFields: { owner: { $first: "$owner" } } },
         ],
-      },
-    },
-    {
-      $project: {
-        comments: 1,
+        totalCount: [{ $count: "count" }],
       },
     },
   ]);
 
-  const videoComments = comments[0]?.comments || [];
+  const comments = result[0]?.comments || [];
+  const total = result[0]?.totalCount[0]?.count || 0;
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, videoComments, "Comments fetched successfully"));
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        comments,
+        total,
+        page,
+        limit,
+      },
+      "Comments fetched successfully"
+    )
+  );
 });
 
-//below is wrong change it 
+/* ===========================
+   Add Comment
+=========================== */
+
 const addComment = asyncHandler(async (req, res) => {
   const { videoObjectId } = req.params;
-  const { videoId } = await getVideoId(videoObjectId);
+  const videoId = await getValidVideoId(videoObjectId);
 
   const { content } = req.body;
 
@@ -103,7 +121,15 @@ const addComment = asyncHandler(async (req, res) => {
         localField: "owner",
         foreignField: "_id",
         as: "owner",
-        pipeline: [{ $project: { fullname: 1, username: 1, avatar: 1 } }],
+        pipeline: [
+          {
+            $project: {
+              fullname: 1,
+              username: 1,
+              avatar: 1,
+            },
+          },
+        ],
       },
     },
     { $addFields: { owner: { $first: "$owner" } } },
@@ -116,21 +142,25 @@ const addComment = asyncHandler(async (req, res) => {
     );
 });
 
-const updateComment = asyncHandler(async (req, res) => {
-  const videoObjectId = req.params.videoObjectId;
-  await getVideoId(videoObjectId);
+/* ===========================
+   Update Comment
+=========================== */
 
-  const userId = req.user._id;
+const updateComment = asyncHandler(async (req, res) => {
+  const { videoObjectId, commentId } = req.params;
+  const videoId = await getValidVideoId(videoObjectId);
+
   const { content } = req.body;
 
   if (!content?.trim()) {
     throw new ApiError(400, "Comment content is required");
   }
 
-  const comment = await Comment.findOneAndUpdate(
+  const updatedComment = await Comment.findOneAndUpdate(
     {
-      _id: req.params.commentId,
-      owner: userId,
+      _id: commentId,
+      owner: req.user._id,
+      video: videoId,
     },
     {
       content: content.trim(),
@@ -140,34 +170,36 @@ const updateComment = asyncHandler(async (req, res) => {
     }
   );
 
-  if (!comment) {
+  if (!updatedComment) {
     throw new ApiError(404, "Comment not found or you're not the owner");
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, comment, "Comment updated successfully"));
+    .json(new ApiResponse(200, updatedComment, "Comment updated successfully"));
 });
 
+/* ===========================
+   Delete Comment
+=========================== */
+
 const deleteComment = asyncHandler(async (req, res) => {
-    const videoObjectId = req.params.videoObjectId;
-    await getVideoId(videoObjectId);
-  
-    const userId = req.user._id;
+  const { videoObjectId, commentId } = req.params;
+  const videoId = await getValidVideoId(videoObjectId);
 
-    const comment = await Comment.findOneAndDelete({
-      _id: req.params.commentId,
-      owner: userId,
-    });
+  const deletedComment = await Comment.findOneAndDelete({
+    _id: commentId,
+    owner: req.user._id,
+    video: videoId,
+  });
 
-    if (!comment) {
-      throw new ApiError(404, "Comment not found or you're not the owner");
-    }
-  
-    return res
-      .status(200)
-      .json(new ApiResponse(200, null, "Comment deleted successfully"));
+  if (!deletedComment) {
+    throw new ApiError(404, "Comment not found or you're not the owner");
+  }
 
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Comment deleted successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
