@@ -1,163 +1,168 @@
-// TODO: Create Register page component
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { validateEmail, validatePassword, validateUsername } from '../utils/validators';
+import { useState } from 'react'
+import '../styles/RegisterPage.css'
+
+// TODO: Implement form validation (password strength, email format)
+// TODO: Add password confirmation matching
+// TODO: Implement terms and conditions checkbox
+// TODO: Add error handling and display
+// TODO: Implement email verification
+// TODO: Add password requirements display
 
 const RegisterPage = () => {
-  const navigate = useNavigate();
-  const { handleRegister, loading, error } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-  });
-  const [validationErrors, setValidationErrors] = useState({});
+    agreeToTerms: false
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  // TODO: Handle form input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
-    }));
-  };
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
 
-  // TODO: Validate form data
-  const validateForm = () => {
-    const errors = {};
-    if (!validateUsername(formData.username)) {
-      errors.username = 'Username must be 3-20 characters, alphanumeric with underscores';
-    }
-    if (!validateEmail(formData.email)) {
-      errors.email = 'Please enter a valid email';
-    }
-    if (!validatePassword(formData.password)) {
-      errors.password = 'Password must be at least 8 characters with uppercase, lowercase, and number';
-    }
+  const handleRegister = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    // TODO: Validate form data
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
+      setError('Passwords do not match')
+      return
     }
-    return errors;
-  };
 
-  // TODO: Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      return;
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long')
+      return
     }
-    try {
-      await handleRegister(formData);
-      navigate('/login');
-    } catch (err) {
-      console.error('Registration failed:', err);
+
+    if (!formData.agreeToTerms) {
+      setError('You must agree to the terms and conditions')
+      return
     }
-  };
+
+    // TODO: Send registration request to /api/users/register
+    // try {
+    //   setLoading(true)
+    //   const response = await fetch('/api/users/register', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({
+    //       username: formData.username,
+    //       email: formData.email,
+    //       password: formData.password
+    //     })
+    //   })
+    //   const data = await response.json()
+    //   if (data.success) {
+    //     // TODO: Redirect to login page
+    //   } else {
+    //     setError(data.message)
+    //   }
+    // } catch (err) {
+    //   setError('Registration failed. Please try again.')
+    // } finally {
+    //   setLoading(false)
+    // }
+  }
 
   return (
     <div className="register-page">
-      <div className="register-page__container">
-        {/* TODO: Add logo */}
-        <h1>Create Your Account</h1>
-
-        {/* TODO: Display error messages */}
+      <div className="register-container">
+        <h1>Create Account</h1>
+        <p>Join YT-X Clone and start sharing</p>
+        
         {error && <div className="error-message">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="register-form">
-          {/* TODO: Username input */}
+        <form onSubmit={handleRegister} className="register-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label>Username</label>
             <input
               type="text"
-              id="username"
               name="username"
               value={formData.username}
-              onChange={handleChange}
-              required
-            />
-            {validationErrors.username && <span className="error-text">{validationErrors.username}</span>}
-          </div>
-
-          {/* TODO: Full Name input */}
-          <div className="form-group">
-            <label htmlFor="fullName">Full Name</label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
+              onChange={handleInputChange}
+              placeholder="Choose a username"
               required
             />
           </div>
 
-          {/* TODO: Email input */}
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label>Email Address</label>
             <input
               type="email"
-              id="email"
               name="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleInputChange}
+              placeholder="Enter your email"
               required
             />
-            {validationErrors.email && <span className="error-text">{validationErrors.email}</span>}
           </div>
 
-          {/* TODO: Password input */}
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            {validationErrors.password && <span className="error-text">{validationErrors.password}</span>}
+            <label>Password</label>
+            <div className="password-input">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Create a strong password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="toggle-password"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            <small>Min 6 characters</small>
           </div>
 
-          {/* TODO: Confirm Password input */}
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label>Confirm Password</label>
             <input
-              type="password"
-              id="confirmPassword"
+              type={showPassword ? 'text' : 'password'}
               name="confirmPassword"
               value={formData.confirmPassword}
-              onChange={handleChange}
+              onChange={handleInputChange}
+              placeholder="Confirm your password"
               required
             />
-            {validationErrors.confirmPassword && <span className="error-text">{validationErrors.confirmPassword}</span>}
           </div>
 
-          {/* TODO: Terms and conditions */}
-          <div className="form-group">
+          <div className="form-group checkbox">
             <label>
-              <input type="checkbox" required /> I agree to Terms and Conditions
+              <input
+                type="checkbox"
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleInputChange}
+              />
+              I agree to the <a href="#terms">Terms and Conditions</a>
             </label>
           </div>
 
-          {/* TODO: Submit button */}
-          <button type="submit" disabled={loading} className="btn btn--primary">
-            {loading ? 'Creating Account...' : 'Register'}
+          <button type="submit" disabled={loading} className="register-btn">
+            {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
-        {/* TODO: Link to login page */}
-        <p className="auth-link">
-          Already have an account? <a href="/login">Login here</a>
-        </p>
+        <div className="register-footer">
+          <p>Already have an account? <a href="#login">Login here</a></p>
+        </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default RegisterPage;
+export default RegisterPage

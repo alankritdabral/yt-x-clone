@@ -1,0 +1,166 @@
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.register-container {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 450px;
+}
+
+.register-container h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #030303;
+  text-align: center;
+}
+
+.register-container > p {
+  text-align: center;
+  color: #606060;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #030303;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #667eea;
+}
+
+.form-group small {
+  font-size: 12px;
+  color: #606060;
+}
+
+.password-input {
+  display: flex;
+  position: relative;
+}
+
+.password-input input {
+  flex: 1;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.form-group.checkbox {
+  gap: 0;
+}
+
+.form-group.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+  cursor: pointer;
+  margin: 0;
+}
+
+.form-group.checkbox input {
+  width: auto;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.form-group.checkbox a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.form-group.checkbox a:hover {
+  text-decoration: underline;
+}
+
+.register-btn {
+  padding: 12px;
+  background-color: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.register-btn:hover:not(:disabled) {
+  background-color: #764ba2;
+}
+
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.register-footer {
+  text-align: center;
+  font-size: 14px;
+  color: #606060;
+}
+
+.register-footer a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-footer a:hover {
+  color: #764ba2;
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 20px;
+  }
+
+  .register-container h1 {
+    font-size: 24px;
+  }
+}

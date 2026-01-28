@@ -1,0 +1,145 @@
+.tweet-feed-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tweet-compose {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.tweet-compose h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #030303;
+}
+
+.tweet-compose textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  margin-bottom: 15px;
+}
+
+.tweet-compose textarea:focus {
+  border-color: #030303;
+}
+
+.tweet-compose button {
+  padding: 10px 24px;
+  background-color: #1d9bf0;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+.tweet-compose button:hover:not(:disabled) {
+  background-color: #1a8cd8;
+}
+
+.tweet-compose button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tweets-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tweet-item {
+  background-color: #fff;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tweet-item:hover {
+  background-color: #f7f7f7;
+}
+
+.tweet-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.tweet-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tweet-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tweet-header strong {
+  font-size: 15px;
+  color: #030303;
+}
+
+.tweet-header span {
+  font-size: 13px;
+  color: #606060;
+  margin-right: 4px;
+}
+
+.tweet-content {
+  font-size: 15px;
+  color: #030303;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.tweet-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+}
+
+.tweet-actions button {
+  background: none;
+  border: none;
+  color: #606060;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tweet-actions button:hover {
+  color: #1d9bf0;
+}
+
+@media (max-width: 768px) {
+  .tweet-feed-page {
+    margin: 0;
+  }
+
+  .tweet-compose,
+  .tweet-item {
+    border-radius: 0;
+  }
+}

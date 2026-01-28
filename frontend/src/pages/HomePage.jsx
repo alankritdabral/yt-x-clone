@@ -1,54 +1,57 @@
-// TODO: Create Home page component
-import React, { useEffect, useState } from 'react';
-import { useVideoStore } from '../store/videoStore';
-import { videoService } from '../services/videoService';
+import { useState, useEffect } from 'react'
+import '../styles/HomePage.css'
+import VideoCard from '../components/VideoCard'
+
+// TODO: Fetch videos from backend API
+// TODO: Implement infinite scroll or pagination
+// TODO: Add filter by category
+// TODO: Add sort options (newest, trending, most viewed)
 
 const HomePage = () => {
-  const { videos, loading, error } = useVideoStore();
-  const [filters, setFilters] = useState({});
+  const [videos, setVideos] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  // TODO: Fetch videos on component mount
   useEffect(() => {
-    const loadVideos = async () => {
-      try {
-        await videoService.fetchAllVideos(filters);
-      } catch (err) {
-        console.error('Failed to load videos:', err);
-      }
-    };
-    loadVideos();
-  }, [filters]);
+    // TODO: Fetch videos from /api/videos endpoint
+    // const fetchVideos = async () => {
+    //   try {
+    //     setLoading(true)
+    //     const response = await fetch('/api/videos')
+    //     const data = await response.json()
+    //     setVideos(data.data)
+    //   } catch (error) {
+    //     console.error('Error fetching videos:', error)
+    //   } finally {
+    //     setLoading(false)
+    //   }
+    // }
+    // fetchVideos()
+  }, [])
 
   return (
     <div className="home-page">
-      {/* TODO: Add filter section */}
-      <section className="home-page__filters">
-        {/* TODO: Category filters */}
-        {/* TODO: Sort options */}
-      </section>
+      <div className="filter-bar">
+        {/* TODO: Add filter buttons */}
+        <button>All</button>
+        <button>Gaming</button>
+        <button>Music</button>
+        <button>Sports</button>
+        <button>News</button>
+      </div>
 
-      {/* TODO: Add video grid */}
-      <section className="home-page__videos">
-        {loading && <p>Loading videos...</p>}
-        {error && <p className="error">Error: {error}</p>}
-        {videos.length > 0 ? (
-          <div className="video-grid">
-            {videos.map((video) => (
-              // TODO: Create VideoCard component
-              <div key={video._id} className="video-card">
-                {/* TODO: Video thumbnail */}
-                {/* TODO: Video title */}
-                {/* TODO: Channel info */}
-                {/* TODO: View count and date */}
-              </div>
-            ))}
-          </div>
+      <div className="videos-grid">
+        {loading ? (
+          <p>Loading videos...</p>
+        ) : videos.length > 0 ? (
+          videos.map((video) => (
+            <VideoCard key={video._id} video={video} />
+          ))
         ) : (
           <p>No videos found</p>
         )}
-      </section>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

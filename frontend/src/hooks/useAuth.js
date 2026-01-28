@@ -1,34 +1,71 @@
-// TODO: Create custom hook for authentication logic
-import { useState, useCallback } from 'react';
-import { useAuthStore } from '../store/authStore';
+// Custom hook for authentication
+import { useState, useCallback } from 'react'
+import apiClient from '../api/axiosClient'
+import { handleAPIError } from '../utils/errorHandler'
 
 export const useAuth = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { user, login, logout, setUser } = useAuthStore();
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user')
+    return savedUser ? JSON.parse(savedUser) : null
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // TODO: Implement login handler
-  const handleLogin = useCallback(async (credentials) => {
-    // TODO: Call login API and handle response
-  }, []);
+  const login = useCallback(async (email, password) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await apiClient.post('/users/login', { email, password })
+      const { user, accessToken } = response.data.data
+      
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('user', JSON.stringify(user))
+      setUser(user)
+      
+      return { success: true, user }
+    } catch (err) {
+      const errorData = handleAPIError(err)
+      setError(errorData)
+      throw errorData
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  // TODO: Implement logout handler
-  const handleLogout = useCallback(async () => {
-    // TODO: Call logout API and clear store
-  }, []);
+  const register = useCallback(async (username, email, password) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await apiClient.post('/users/register', { username, email, password })
+      return { success: true, data: response.data.data }
+    } catch (err) {
+      const errorData = handleAPIError(err)
+      setError(errorData)
+      throw errorData
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  // TODO: Implement register handler
-  const handleRegister = useCallback(async (userData) => {
-    // TODO: Call register API and handle response
-  }, []);
+  const logout = useCallback(() => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('user')
+    setUser(null)
+    setError(null)
+  }, [])
+
+  const isAuthenticated = !!user
 
   return {
     user,
     loading,
     error,
-    handleLogin,
-    handleLogout,
-    handleRegister,
-    isAuthenticated: !!user,
-  };
-};
+    login,
+    register,
+    logout,
+    isAuthenticated,
+    setError,
+  }
+}
+
+export default useAuth

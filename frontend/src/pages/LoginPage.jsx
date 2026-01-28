@@ -1,93 +1,110 @@
-// TODO: Create Login page component
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useState } from 'react'
+import '../styles/LoginPage.css'
 
-const LoginPage = () => {
-  const navigate = useNavigate();
-  const { handleLogin, loading, error } = useAuth();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+// TODO: Implement email/password validation
+// TODO: Add error handling and display
+// TODO: Implement "remember me" functionality
+// TODO: Add password visibility toggle
+// TODO: Implement forgot password link
+// TODO: Add social login options (Google, GitHub, etc.)
 
-  // TODO: Handle form input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+const LoginPage = ({ setIsLoggedIn, setUser }) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  // TODO: Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await handleLogin(formData);
-      navigate('/');
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
-  };
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    // TODO: Send login request to /api/users/login
+    // try {
+    //   setLoading(true)
+    //   const response = await fetch('/api/users/login', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ email, password })
+    //   })
+    //   const data = await response.json()
+    //   if (data.success) {
+    //     setIsLoggedIn(true)
+    //     setUser(data.data.user)
+    //     localStorage.setItem('token', data.data.token)
+    //   } else {
+    //     setError(data.message)
+    //   }
+    // } catch (err) {
+    //   setError('Login failed. Please try again.')
+    // } finally {
+    //   setLoading(false)
+    // }
+  }
 
   return (
     <div className="login-page">
-      <div className="login-page__container">
-        {/* TODO: Add logo */}
-        <h1>Login to Your Account</h1>
-
-        {/* TODO: Display error message if exists */}
+      <div className="login-container">
+        <h1>Login to YT-X Clone</h1>
         {error && <div className="error-message">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="login-form">
-          {/* TODO: Email input */}
+        
+        <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label>Email Address</label>
             <input
               type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               required
             />
           </div>
 
-          {/* TODO: Password input */}
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <label>Password</label>
+            <div className="password-input">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="toggle-password"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
 
-          {/* TODO: Remember me and forgot password */}
           <div className="form-options">
             <label>
-              <input type="checkbox" /> Remember me
+              <input type="checkbox" />
+              Remember me
             </label>
-            <a href="#forgot">Forgot password?</a>
+            <a href="#forgot-password">Forgot password?</a>
           </div>
 
-          {/* TODO: Submit button */}
-          <button type="submit" disabled={loading} className="btn btn--primary">
+          <button type="submit" disabled={loading} className="login-btn">
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        {/* TODO: Link to register page */}
-        <p className="auth-link">
-          Don't have an account? <a href="/register">Register here</a>
-        </p>
+        <div className="social-login">
+          <p>Or login with:</p>
+          <button className="social-btn google-btn">Google</button>
+          <button className="social-btn github-btn">GitHub</button>
+        </div>
+
+        <div className="login-footer">
+          <p>Don't have an account? <a href="#register">Sign up here</a></p>
+        </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
