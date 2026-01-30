@@ -16,29 +16,29 @@ const TweetFeedPage = () => {
 
   useEffect(() => {
     // TODO: Fetch tweets from /api/tweets
-    // const fetchTweets = async () => {
-    //   try {
-    //     setLoading(true)
-    //     const response = await fetch('/api/tweets')
-    //     const data = await response.json()
-    //     setTweets(data.data)
-    //   } catch (error) {
-    //     console.error('Error fetching tweets:', error)
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // }
-    // fetchTweets()
+    const fetchTweets = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/tweets')
+        const data = await response.json()
+        setTweets(data.data)
+      } catch (error) {
+        console.error('Error fetching tweets:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTweets()
   }, [])
 
   const handlePostTweet = async () => {
     if (!tweetContent.trim()) return
     // TODO: Send tweet creation request to /api/tweets
-    // const response = await fetch('/api/tweets', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ content: tweetContent })
-    // })
+    const response = await fetch('/api/tweets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: tweetContent })
+    })
     setTweetContent('')
   }
 

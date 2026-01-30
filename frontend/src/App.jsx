@@ -15,52 +15,42 @@ import RegisterPage from './pages/RegisterPage'
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState(null)
-
-  // TODO: Check if user is already logged in on mount
-  useEffect(() => {
-    // TODO: Fetch user data from localStorage or API
-  }, [])
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState({
+    username: 'SignIn',
+    avatar: 'https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg'
+  }) // Mock user for testing
 
   const renderPage = () => {
-    // TODO: Implement page routing logic
     switch (currentPage) {
-      case 'home':
-        return <HomePage />
-      case 'video':
-        return <VideoPage />
-      case 'upload':
-        return <UploadPage />
-      case 'profile':
-        return <ProfilePage />
-      case 'search':
-        return <SearchPage />
-      case 'playlist':
-        return <PlaylistPage />
-      case 'tweets':
-        return <TweetFeedPage />
-      case 'login':
-        return <LoginPage setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
-      case 'register':
-        return <RegisterPage />
-      default:
-        return <HomePage />
+      case 'home': return <HomePage />
+      case 'video': return <VideoPage />
+      case 'upload': return <UploadPage />
+      case 'profile': return <ProfilePage />
+      case 'search': return <SearchPage />
+      case 'playlist': return <PlaylistPage />
+      case 'tweets': return <TweetFeedPage />
+      case 'login': return <LoginPage setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
+      case 'register': return <RegisterPage />
+      default: return <HomePage />
     }
   }
 
   return (
-    <div className="app">
-      {/* TODO: Conditionally render navbar based on login state */}
-      {isLoggedIn && <Navbar setCurrentPage={setCurrentPage} user={user} />}
-      <div className="app-container">
-        {/* TODO: Conditionally render sidebar based on login state */}
-        {isLoggedIn && <Sidebar setCurrentPage={setCurrentPage} />}
-        <main className="main-content">
+    <div className="flex flex-col h-screen bg-[#F6F0D7]">
+      {/* Navbar stays at the top */}
+      <Navbar setCurrentPage={setCurrentPage} user={user} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar as hamburger menu */}
+        <Sidebar setCurrentPage={setCurrentPage} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+        {/* Main content area takes full width */}
+        <main className="flex-1 overflow-y-auto p-6 bg-[#F6F0D7]">
           {renderPage()}
         </main>
       </div>
     </div>
-  )
+  );
 }
-
 export default App

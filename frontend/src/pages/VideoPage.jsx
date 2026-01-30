@@ -20,19 +20,19 @@ const VideoPage = () => {
 
   useEffect(() => {
     // TODO: Fetch video details from /api/videos/:videoId
-    // const fetchVideo = async () => {
-    //   try {
-    //     setLoading(true)
-    //     const response = await fetch(`/api/videos/${videoId}`)
-    //     const data = await response.json()
-    //     setVideo(data.data)
-    //   } catch (error) {
-    //     console.error('Error fetching video:', error)
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // }
-    // fetchVideo()
+    const fetchVideo = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/videos/${videoId}`)
+        const data = await response.json()
+        setVideo(data.data)
+      } catch (error) {
+        console.error('Error fetching video:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchVideo()
   }, [])
 
   const handleLike = () => {

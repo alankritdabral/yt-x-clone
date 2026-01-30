@@ -9,7 +9,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
    Get All Videos
 =========================== */
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+  const { page = 1, limit = 10, query, sortBy, sortType } = req.query;
 
   const pageNumber = Math.max(Number(page), 1);
   const limitNumber = Math.min(Number(limit), 50);
@@ -23,12 +23,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
     ];
   }
 
-  if (userId) {
-    if (!isValidObjectId(userId)) {
-      throw new ApiError(400, "Invalid userId");
-    }
-    filter.owner = new mongoose.Types.ObjectId(userId);
-  }
+  // if (userId) {
+  //   if (!isValidObjectId(userId)) {
+  //     throw new ApiError(400, "Invalid userId");
+  //   }
+  //   filter.owner = new mongoose.Types.ObjectId(userId);
+  // }
 
   const sort = {};
   if (sortBy) {
@@ -45,19 +45,21 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   const totalVideos = await Video.countDocuments(filter);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        videos,
-        page: pageNumber,
-        limit: limitNumber,
-        totalVideos,
-        totalPages: Math.ceil(totalVideos / limitNumber),
-      },
-      "Videos fetched successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          videos,
+          page: pageNumber,
+          limit: limitNumber,
+          totalVideos,
+          totalPages: Math.ceil(totalVideos / limitNumber),
+        },
+        "Videos fetched successfully"
+      )
+    );
 });
 
 /* ===========================

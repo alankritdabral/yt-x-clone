@@ -48,29 +48,29 @@ const RegisterPage = () => {
       return
     }
 
-    // TODO: Send registration request to /api/users/register
-    // try {
-    //   setLoading(true)
-    //   const response = await fetch('/api/users/register', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({
-    //       username: formData.username,
-    //       email: formData.email,
-    //       password: formData.password
-    //     })
-    //   })
-    //   const data = await response.json()
-    //   if (data.success) {
-    //     // TODO: Redirect to login page
-    //   } else {
-    //     setError(data.message)
-    //   }
-    // } catch (err) {
-    //   setError('Registration failed. Please try again.')
-    // } finally {
-    //   setLoading(false)
-    // }
+    // TODO: Send registration request to / api / users / register
+    try {
+      setLoading(true)
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      })
+      const data = await response.json()
+      if (data.success) {
+        // TODO: Redirect to login page
+      } else {
+        setError(data.message)
+      }
+    } catch (err) {
+      setError('Registration failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -78,7 +78,7 @@ const RegisterPage = () => {
       <div className="register-container">
         <h1>Create Account</h1>
         <p>Join YT-X Clone and start sharing</p>
-        
+
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleRegister} className="register-form">

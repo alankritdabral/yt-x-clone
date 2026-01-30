@@ -1,145 +1,86 @@
-.tweet-feed-page {
-  max-width: 800px;
-  margin: 0 auto;
-}
+@import "tailwindcss";
 
-.tweet-compose {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border: 1px solid #e0e0e0;
-}
-
-.tweet-compose h2 {
-  font-size: 20px;
-  margin-bottom: 15px;
-  color: #030303;
-}
-
-.tweet-compose textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  outline: none;
-  margin-bottom: 15px;
-}
-
-.tweet-compose textarea:focus {
-  border-color: #030303;
-}
-
-.tweet-compose button {
-  padding: 10px 24px;
-  background-color: #1d9bf0;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 15px;
-  transition: background-color 0.3s;
-}
-
-.tweet-compose button:hover:not(:disabled) {
-  background-color: #1a8cd8;
-}
-
-.tweet-compose button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tweets-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.tweet-item {
-  background-color: #fff;
-  padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.tweet-item:hover {
-  background-color: #f7f7f7;
-}
-
-.tweet-header {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-  align-items: flex-start;
-}
-
-.tweet-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.tweet-header > div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tweet-header strong {
-  font-size: 15px;
-  color: #030303;
-}
-
-.tweet-header span {
-  font-size: 13px;
-  color: #606060;
-  margin-right: 4px;
-}
-
-.tweet-content {
-  font-size: 15px;
-  color: #030303;
-  margin-bottom: 12px;
-  line-height: 1.5;
-  word-wrap: break-word;
-}
-
-.tweet-actions {
-  display: flex;
-  gap: 20px;
-  justify-content: flex-start;
-}
-
-.tweet-actions button {
-  background: none;
-  border: none;
-  color: #606060;
-  cursor: pointer;
-  font-size: 13px;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tweet-actions button:hover {
-  color: #1d9bf0;
-}
-
-@media (max-width: 768px) {
+@layer components {
   .tweet-feed-page {
-    margin: 0;
+    @apply max-w-2xl mx-auto;
   }
 
-  .tweet-compose,
+  .tweet-compose {
+    @apply bg-[#C5D89D] p-5 rounded-[16px] mb-5 border border-[#9CAB84];
+  }
+
+  .tweet-compose h2 {
+    @apply text-xl mb-4 text-[#89986D];
+  }
+
+  .tweet-compose textarea {
+    @apply w-full p-3 border border-[#9CAB84] rounded-[12px] text-sm font-sans resize outline-none mb-4 bg-[#F6F0D7] text-[#89986D];
+  }
+
+  .tweet-compose textarea:focus {
+    @apply border-[#89986D] shadow-[0_0_0_3px_rgba(156,171,132,0.1)];
+  }
+
+  .tweet-compose button {
+    @apply px-6 py-2.5 bg-[#9CAB84] text-[#F6F0D7] border-none rounded-full cursor-pointer font-[600] text-sm transition-all duration-300 hover:bg-[#89986D] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)];
+  }
+
+  .tweet-compose button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .tweets-feed {
+    @apply flex flex-col gap-0;
+  }
+
   .tweet-item {
-    border-radius: 0;
+    @apply bg-[#C5D89D] p-4 border-b border-[#9CAB84] cursor-pointer transition-colors duration-200 hover:bg-[#F6F0D7]/50;
+  }
+
+  .tweet-header {
+    @apply flex gap-3 mb-3 items-start;
+  }
+
+  .tweet-avatar {
+    @apply w-12 h-12 rounded-full object-cover border-2 border-[#9CAB84];
+  }
+
+  .tweet-header > div {
+    @apply flex flex-col gap-1;
+  }
+
+  .tweet-header strong {
+    @apply text-sm text-[#89986D];
+  }
+
+  .tweet-header span {
+    @apply text-xs text-[#9CAB84] mr-1;
+  }
+
+  .tweet-content {
+    @apply text-sm text-[#89986D] mb-3 leading-relaxed break-words;
+  }
+
+  .tweet-actions {
+    @apply flex gap-5 justify-start;
+  }
+
+  .tweet-actions button {
+    @apply bg-none border-none text-[#9CAB84] cursor-pointer text-xs transition-colors duration-200 flex items-center gap-2 hover:text-[#9CAB84];
+  }
+
+  .tweet-actions button:hover {
+    @apply text-[#89986D];
+  }
+
+  @media (max-width: 768px) {
+    .tweet-feed-page {
+      @apply m-0;
+    }
+
+    .tweet-compose,
+    .tweet-item {
+      @apply rounded-none;
+    }
   }
 }

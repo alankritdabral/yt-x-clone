@@ -13,6 +13,7 @@ import {
   updateAccountDetails,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { alreadyLoggedIn } from "../middlewares/alreadyLoggedIn.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -31,7 +32,7 @@ router.route("/register").post(
   registerUser
 );
 
-router.route("/login").post(loginUser);
+router.post("/login", alreadyLoggedIn, loginUser);
 
 //secured routes
 router.route("/logout").post(verifyJWT, logoutUser);

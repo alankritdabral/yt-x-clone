@@ -16,20 +16,20 @@ const SearchPage = () => {
 
   useEffect(() => {
     // TODO: Fetch search results from /api/search?q=query
-    // const performSearch = async () => {
-    //   if (!searchQuery) return
-    //   try {
-    //     setLoading(true)
-    //     const response = await fetch(`/api/search?q=${searchQuery}&type=${filterType}`)
-    //     const data = await response.json()
-    //     setResults(data.data)
-    //   } catch (error) {
-    //     console.error('Error searching:', error)
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // }
-    // performSearch()
+    const performSearch = async () => {
+      if (!searchQuery) return
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/search?q=${searchQuery}&type=${filterType}`)
+        const data = await response.json()
+        setResults(data.data)
+      } catch (error) {
+        console.error('Error searching:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    performSearch()
   }, [searchQuery, filterType])
 
   return (

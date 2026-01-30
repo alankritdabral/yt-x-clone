@@ -1,98 +1,65 @@
-.upload-page {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+@import "tailwindcss";
 
-.upload-page h1 {
-  margin-bottom: 30px;
-  color: #030303;
-}
-
-.upload-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-weight: 500;
-  color: #030303;
-  font-size: 14px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: 12px;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  border-color: #030303;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.upload-progress {
-  padding: 15px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  margin: 10px 0;
-}
-
-.upload-progress p {
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.upload-progress progress {
-  width: 100%;
-  height: 6px;
-}
-
-.submit-btn {
-  padding: 12px 24px;
-  background-color: #030303;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background-color: #1a1a1a;
-}
-
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
+@layer components {
   .upload-page {
-    padding: 20px;
+    @apply max-w-2xl mx-auto bg-[#C5D89D] p-8 rounded-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-[#9CAB84];
+  }
+
+  .upload-page h1 {
+    @apply mb-8 text-[#89986D];
+  }
+
+  .upload-form {
+    @apply flex flex-col gap-5;
+  }
+
+  .form-group {
+    @apply flex flex-col gap-2;
+  }
+
+  .form-group label {
+    @apply font-[600] text-[#89986D] text-sm;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    @apply p-3 border border-[#9CAB84] rounded-[12px] text-sm font-sans outline-none transition-all duration-300 bg-[#F6F0D7] text-[#89986D];
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    @apply border-[#89986D] shadow-[0_0_0_3px_rgba(156,171,132,0.1)];
+  }
+
+  .form-group textarea {
+    @apply resize min-h-24;
+  }
+
+  .upload-progress {
+    @apply p-4 bg-[#F6F0D7] rounded-[12px] m-2.5 border border-[#9CAB84];
+  }
+
+  .upload-progress p {
+    @apply mb-2.5 text-sm text-[#89986D];
+  }
+
+  .upload-progress progress {
+    @apply w-full h-1.5;
+  }
+
+  .submit-btn {
+    @apply px-6 py-3 bg-[#9CAB84] text-[#F6F0D7] border-none rounded-[12px] cursor-pointer text-base font-[600] transition-all duration-300 hover:bg-[#89986D] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)];
+  }
+
+  .submit-btn:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    .upload-page {
+      @apply p-5;
+    }
   }
 }

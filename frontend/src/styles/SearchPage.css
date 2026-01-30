@@ -1,62 +1,45 @@
-.search-page {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+@import "tailwindcss";
 
-.search-filters {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
+@layer components {
+  .search-page {
+    @apply max-w-5xl mx-auto;
+  }
 
-.search-input {
-  flex: 1;
-  padding: 12px 15px;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-}
-
-.search-input:focus {
-  border-color: #030303;
-}
-
-.search-filters select {
-  padding: 12px 15px;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  background-color: #fff;
-}
-
-.search-filters select:focus {
-  border-color: #030303;
-}
-
-.search-results {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-@media (max-width: 768px) {
   .search-filters {
-    flex-direction: column;
+    @apply flex gap-4 mb-8 bg-[#C5D89D] p-5 rounded-[16px] border border-[#9CAB84];
+  }
+
+  .search-input {
+    @apply flex-1 px-4 py-3 border border-[#9CAB84] rounded-[12px] text-sm outline-none bg-[#F6F0D7] text-[#89986D];
+  }
+
+  .search-input:focus {
+    @apply border-[#89986D] shadow-[0_0_0_3px_rgba(156,171,132,0.1)];
+  }
+
+  .search-filters select {
+    @apply px-4 py-3 border border-[#9CAB84] rounded-[12px] text-sm outline-none cursor-pointer bg-[#F6F0D7] text-[#89986D];
+  }
+
+  .search-filters select:focus {
+    @apply border-[#89986D] shadow-[0_0_0_3px_rgba(156,171,132,0.1)];
+  }
+
+  .search-results {
+    @apply bg-[#C5D89D] p-5 rounded-[16px] border border-[#9CAB84];
   }
 
   .results-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    @apply grid gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))];
+  }
+
+  @media (max-width: 768px) {
+    .search-filters {
+      @apply flex-col;
+    }
+
+    .results-grid {
+      @apply grid-cols-[repeat(auto-fill,minmax(200px,1fr))];
+    }
   }
 }

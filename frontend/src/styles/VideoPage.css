@@ -1,357 +1,207 @@
-.video-page {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 20px;
-}
+@import "tailwindcss";
 
-.video-container {
-  grid-column: 1;
-  width: 100%;
-  background-color: #000;
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 16 / 9;
-}
-
-.video-player {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.video-details {
-  grid-column: 1;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.video-details h1 {
-  font-size: 28px;
-  margin-bottom: 12px;
-  color: #030303;
-}
-
-.video-meta {
-  font-size: 14px;
-  color: #606060;
-  margin-bottom: 16px;
-  display: flex;
-  gap: 8px;
-}
-
-.video-actions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.action-btn {
-  padding: 8px 16px;
-  background-color: #f0f0f0;
-  border: 1px solid #d3d3d3;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.action-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.action-btn.active {
-  background-color: #030303;
-  color: #fff;
-  border-color: #030303;
-}
-
-.channel-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 20px;
-}
-
-.channel-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.channel-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.channel-info h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #030303;
-  margin: 0;
-}
-
-.channel-info p {
-  font-size: 12px;
-  color: #606060;
-  margin: 0;
-}
-
-.subscribe-btn {
-  padding: 10px 24px;
-  background-color: #030303;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-.subscribe-btn:hover {
-  background-color: #1a1a1a;
-}
-
-.subscribe-btn.subscribed {
-  background-color: #f0f0f0;
-  color: #030303;
-}
-
-.video-description {
-  background-color: #f9f9f9;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.video-description h3 {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #030303;
-}
-
-.video-description p {
-  font-size: 14px;
-  color: #030303;
-  line-height: 1.5;
-}
-
-.comments-section {
-  grid-column: 1;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.comments-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
-  color: #030303;
-}
-
-.comment-compose {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.comment-compose textarea {
-  padding: 12px;
-  border: 1px solid #d3d3d3;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  outline: none;
-}
-
-.comment-compose textarea:focus {
-  border-color: #030303;
-}
-
-.comment-compose button {
-  align-self: flex-start;
-  padding: 8px 16px;
-  background-color: #030303;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.comment-compose button:hover:not(:disabled) {
-  background-color: #1a1a1a;
-}
-
-.comment-compose button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.comment-item {
-  display: flex;
-  gap: 12px;
-}
-
-.comment-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.comment-content {
-  flex: 1;
-}
-
-.comment-header {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.comment-header strong {
-  font-size: 14px;
-  color: #030303;
-}
-
-.comment-header span {
-  font-size: 12px;
-  color: #606060;
-}
-
-.comment-content p {
-  font-size: 14px;
-  color: #030303;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.comment-actions button {
-  background: none;
-  border: none;
-  color: #606060;
-  cursor: pointer;
-  font-size: 13px;
-  transition: color 0.2s;
-}
-
-.comment-actions button:hover {
-  color: #030303;
-}
-
-.related-videos {
-  grid-column: 2;
-  grid-row: 1 / span 3;
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 8px;
-  height: fit-content;
-}
-
-.related-videos h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: #030303;
-}
-
-.related-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.related-item {
-  cursor: pointer;
-  border-radius: 4px;
-  overflow: hidden;
-  transition: transform 0.2s;
-}
-
-.related-item:hover {
-  transform: translateY(-2px);
-}
-
-.related-item img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  margin-bottom: 8px;
-}
-
-.related-item h4 {
-  font-size: 13px;
-  font-weight: 600;
-  color: #030303;
-  margin: 0 0 4px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.related-item p {
-  font-size: 12px;
-  color: #606060;
-  margin: 0;
-}
-
-@media (max-width: 1200px) {
+@layer components {
   .video-page {
-    grid-template-columns: 1fr;
+    @apply max-w-7xl mx-auto grid gap-5 grid-cols-[1fr_350px];
   }
 
-  .related-videos {
-    grid-column: 1;
-    grid-row: auto;
-  }
-}
-
-@media (max-width: 768px) {
   .video-container {
-    aspect-ratio: auto;
-    height: 300px;
+    @apply w-full bg-[#89986D] rounded-[16px] overflow-hidden aspect-video;
+  }
+
+  .video-player {
+    @apply w-full h-full object-contain;
+  }
+
+  .video-details {
+    @apply bg-[#C5D89D] p-5 rounded-[16px] border border-[#9CAB84];
   }
 
   .video-details h1 {
-    font-size: 20px;
+    @apply text-3xl mb-3 text-[#89986D];
+  }
+
+  .video-meta {
+    @apply text-sm text-[#9CAB84] mb-4 flex gap-2;
+  }
+
+  .video-actions {
+    @apply flex gap-3 mb-5 pb-5 border-b border-[#9CAB84];
+  }
+
+  .action-btn {
+    @apply px-4 py-2 bg-[#F6F0D7] border border-[#9CAB84] rounded-full cursor-pointer text-sm font-[600] transition-all duration-300 text-[#89986D] hover:bg-[#9CAB84] hover:text-[#F6F0D7];
+  }
+
+  .action-btn.active {
+    @apply bg-[#9CAB84] text-[#F6F0D7] border-[#9CAB84];
   }
 
   .channel-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    @apply flex justify-between items-center pb-5 border-b border-[#9CAB84] mb-5;
+  }
+
+  .channel-info {
+    @apply flex items-center gap-3;
+  }
+
+  .channel-avatar {
+    @apply w-12 h-12 rounded-full object-cover border-2 border-[#9CAB84];
+  }
+
+  .channel-info h3 {
+    @apply text-sm font-[600] text-[#89986D] m-0;
+  }
+
+  .channel-info p {
+    @apply text-xs text-[#9CAB84] m-0;
   }
 
   .subscribe-btn {
-    width: 100%;
+    @apply px-6 py-2.5 bg-[#9CAB84] text-[#F6F0D7] border-none rounded-full cursor-pointer font-[600] text-sm transition-all duration-300 hover:bg-[#89986D] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)];
+  }
+
+  .subscribe-btn.subscribed {
+    @apply bg-[#C5D89D] text-[#89986D] border border-[#9CAB84];
+  }
+
+  .video-description {
+    @apply bg-[#F6F0D7] p-4 rounded-[16px] border border-[#9CAB84];
+  }
+
+  .video-description h3 {
+    @apply text-sm font-[600] mb-2 text-[#89986D];
+  }
+
+  .video-description p {
+    @apply text-sm text-[#89986D] leading-relaxed;
+  }
+
+  .comments-section {
+    @apply bg-[#C5D89D] p-5 rounded-[16px] border border-[#9CAB84];
+  }
+
+  .comments-section h2 {
+    @apply text-xl mb-5 text-[#89986D];
+  }
+
+  .comment-compose {
+    @apply flex flex-col gap-3 mb-5 pb-5 border-b border-[#9CAB84];
+  }
+
+  .comment-compose textarea {
+    @apply p-3 border border-[#9CAB84] rounded-[12px] text-sm font-sans resize outline-none bg-[#F6F0D7] text-[#89986D];
+  }
+
+  .comment-compose textarea:focus {
+    @apply border-[#89986D] shadow-[0_0_0_3px_rgba(156,171,132,0.1)];
+  }
+
+  .comment-compose button {
+    @apply self-start px-4 py-2 bg-[#9CAB84] text-[#F6F0D7] border-none rounded-[12px] cursor-pointer font-[600] text-sm transition-all duration-300 hover:bg-[#89986D];
+  }
+
+  .comment-compose button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .comments-list {
+    @apply flex flex-col gap-4;
+  }
+
+  .comment-item {
+    @apply flex gap-3;
+  }
+
+  .comment-avatar {
+    @apply w-8 h-8 rounded-full object-cover flex-shrink-0 border border-[#9CAB84];
+  }
+
+  .comment-content {
+    @apply flex-1;
+  }
+
+  .comment-header {
+    @apply flex gap-2 items-center mb-1;
+  }
+
+  .comment-header strong {
+    @apply text-sm text-[#89986D];
+  }
+
+  .comment-header span {
+    @apply text-xs text-[#9CAB84];
+  }
+
+  .comment-content p {
+    @apply text-sm text-[#89986D] mb-2 leading-relaxed;
+  }
+
+  .comment-actions {
+    @apply flex gap-3;
+  }
+
+  .comment-actions button {
+    @apply bg-none border-none text-[#9CAB84] cursor-pointer text-xs transition-colors duration-200 hover:text-[#89986D];
+  }
+
+  .related-videos {
+    @apply bg-[#C5D89D] p-4 rounded-[16px] h-fit border border-[#9CAB84];
+  }
+
+  .related-videos h2 {
+    @apply text-base mb-4 text-[#89986D];
+  }
+
+  .related-grid {
+    @apply flex flex-col gap-3;
+  }
+
+  .related-item {
+    @apply cursor-pointer rounded-[12px] overflow-hidden transition-all duration-200 bg-[#F6F0D7] border border-[#9CAB84];
+  }
+
+  .related-item:hover {
+    @apply -translate-y-0.5 shadow-[0_4px_12px_rgba(0,0,0,0.06)];
+  }
+
+  .related-item img {
+    @apply w-full aspect-video object-cover mb-2;
+  }
+
+  .related-item h4 {
+    @apply text-xs font-[600] text-[#89986D] m-0 mb-1 line-clamp-2 px-2;
+  }
+
+  .related-item p {
+    @apply text-xs text-[#9CAB84] m-0 px-2 pb-2;
+  }
+
+  @media (max-width: 1200px) {
+    .video-page {
+      @apply grid-cols-1;
+    }
+
+    .related-videos {
+      @apply col-span-1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .video-container {
+      @apply h-80;
+    }
+
+    .video-details h1 {
+      @apply text-xl;
+    }
+
+    .channel-section {
+      @apply flex-col items-start gap-3;
+    }
+
+    .subscribe-btn {
+      @apply w-full;
+    }
   }
 }

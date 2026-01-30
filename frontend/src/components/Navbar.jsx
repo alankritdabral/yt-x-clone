@@ -5,20 +5,40 @@ import '../styles/Navbar.css'
 // TODO: Add user profile dropdown menu
 // TODO: Implement logout functionality
 
-const Navbar = ({ setCurrentPage, user }) => {
+const Navbar = ({ setCurrentPage, user, sidebarOpen, setSidebarOpen }) => {
   const handleSearch = (e) => {
     // TODO: Handle search input and navigate to search page
   }
 
-  const handleLogout = () => {
-    // TODO: Clear user data and reset app state
+  const handleLogout = async () => {
+    const response = await fetch("http://localhost:8000/api/v1/users/logout",
+      {
+        method: "GET",
+        credentials: 'include'
+      },)
+    if (response.ok) {
+      loginStastus = "flase"
+    }
+    else {
+      alert("logout fail")
+    }
+
   }
 
   return (
     <nav className="navbar">
       <div className="navbar-left">
+        <button 
+          className="hamburger-btn" 
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
         <div className="logo" onClick={() => setCurrentPage('home')}>
-          <h1>YT-X Clone</h1>
+          <h2>YT-X Clone</h2>
         </div>
       </div>
 

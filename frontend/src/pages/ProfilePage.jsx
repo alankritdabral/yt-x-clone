@@ -17,19 +17,19 @@ const ProfilePage = () => {
 
   useEffect(() => {
     // TODO: Fetch current user profile data from /api/users/profile
-    // const fetchProfile = async () => {
-    //   try {
-    //     setLoading(true)
-    //     const response = await fetch('/api/users/profile')
-    //     const data = await response.json()
-    //     setUser(data.data)
-    //   } catch (error) {
-    //     console.error('Error fetching profile:', error)
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // }
-    // fetchProfile()
+    const fetchProfile = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/users/profile')
+        const data = await response.json()
+        setUser(data.data)
+      } catch (error) {
+        console.error('Error fetching profile:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
   }, [])
 
   const handleEditProfile = () => {

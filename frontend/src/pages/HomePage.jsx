@@ -12,22 +12,37 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // TODO: Fetch videos from /api/videos endpoint
-    // const fetchVideos = async () => {
-    //   try {
-    //     setLoading(true)
-    //     const response = await fetch('/api/videos')
-    //     const data = await response.json()
-    //     setVideos(data.data)
-    //   } catch (error) {
-    //     console.error('Error fetching videos:', error)
-    //   } finally {
-    //     setLoading(false)
-    //   }
-    // }
-    // fetchVideos()
-  }, [])
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
 
+        const response = await fetch(
+          "http://localhost:8000/api/v1/videos",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        // 🔥 DO NOT parse JSON if backend failed
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text);
+        }
+
+        const data = await response.json();
+        console.log('API Response:', data);
+        console.log('First video:', data.data.videos[0]);
+        setVideos(data.data.videos);
+      } catch (error) {
+        console.error("Error fetching videos:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
   return (
     <div className="home-page">
       <div className="filter-bar">
