@@ -1,120 +1,120 @@
-import { useState, useEffect } from 'react'
-import '../styles/ProfilePage.css'
+import { useState } from "react";
 
-// TODO: Fetch user profile data from backend
-// TODO: Implement profile edit functionality
-// TODO: Add user's video list
-// TODO: Add user's playlist list
-// TODO: Implement avatar upload
-// TODO: Add follower/following section
+const tabs = ["Home", "Videos", "Playlists", "About"];
+
+const videos = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  title: `Sample Video Title ${i + 1}`,
+  views: `${Math.floor(Math.random() * 100)}K views`,
+  time: "2 days ago",
+  thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+}));
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null)
-  const [userVideos, setUserVideos] = useState([])
-  const [userPlaylists, setUserPlaylists] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-
-  useEffect(() => {
-    // TODO: Fetch current user profile data from /api/users/profile
-    const fetchProfile = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/users/profile')
-        const data = await response.json()
-        setUser(data.data)
-      } catch (error) {
-        console.error('Error fetching profile:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchProfile()
-  }, [])
-
-  const handleEditProfile = () => {
-    // TODO: Submit profile changes to backend
-    setIsEditing(!isEditing)
-  }
+  const [activeTab, setActiveTab] = useState("Home");
 
   return (
-    <div className="profile-page">
-      {loading ? (
-        <p>Loading profile...</p>
-      ) : (
-        <>
-          <div className="profile-header">
-            <img src={user?.avatar} alt="User avatar" className="profile-avatar" />
-            <div className="profile-info">
-              <h1>{user?.username}</h1>
-              <p>{user?.email}</p>
-              <div className="profile-stats">
-                <div>
-                  <strong>{user?.subscribers}</strong>
-                  <span>Subscribers</span>
-                </div>
-                <div>
-                  <strong>{user?.subscribedTo?.length}</strong>
-                  <span>Following</span>
-                </div>
-                <div>
-                  <strong>{userVideos?.length}</strong>
-                  <span>Videos</span>
-                </div>
-              </div>
-              <button className="edit-profile-btn" onClick={handleEditProfile}>
-                {isEditing ? 'Save Changes' : 'Edit Profile'}
-              </button>
+    <div className="w-full bg-[#F6F0D7] min-h-screen">
+      {/* ===== Channel Banner ===== */}
+      <div className="h-48 md:h-60 bg-gray-300">
+        <img
+          src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366"
+          alt="Channel Banner"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* ===== Channel Info ===== */}
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between py-6 gap-4">
+          <div className="flex items-center gap-5">
+            <img
+              src="https://i.pravatar.cc/150"
+              alt="Avatar"
+              className="w-24 h-24 rounded-full"
+            />
+
+            <div>
+              <h1 className="text-2xl font-bold">YT-X Channel</h1>
+              <p className="text-sm text-gray-600">
+                @ytx • 120K subscribers • 45 videos
+              </p>
             </div>
           </div>
 
-          {isEditing && (
-            <div className="edit-profile-form">
-              {/* TODO: Add profile edit form fields */}
-              <input type="text" placeholder="Username" defaultValue={user?.username} />
-              <textarea placeholder="Bio" defaultValue={user?.bio} />
+          <button className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-900 w-fit">
+            Subscribe
+          </button>
+        </div>
+
+        {/* ===== Tabs ===== */}
+        <div className="border-b border-gray-300 flex gap-6 text-sm font-medium">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 ${
+                activeTab === tab
+                  ? "border-b-2 border-black text-black"
+                  : "text-gray-500 hover:text-black"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* ===== Content ===== */}
+        <div className="py-6">
+          {activeTab === "Home" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {videos.map((video) => (
+                <div key={video.id} className="cursor-pointer">
+                  <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden">
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <h3 className="mt-2 text-sm font-semibold line-clamp-2">
+                    {video.title}
+                  </h3>
+                  <p className="text-xs text-gray-600">
+                    {video.views} • {video.time}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
 
-          <div className="profile-content">
-            <div className="profile-videos">
-              <h2>Videos</h2>
-              <div className="videos-grid">
-                {/* TODO: Render user's videos */}
-                {userVideos.length > 0 ? (
-                  userVideos.map(video => (
-                    <div key={video._id} className="video-item">
-                      <img src={video.thumbnail} alt={video.title} />
-                      <p>{video.title}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No videos uploaded yet</p>
-                )}
-              </div>
-            </div>
+          {activeTab === "Videos" && (
+            <p className="text-gray-600">All uploaded videos will appear here.</p>
+          )}
 
-            <div className="profile-playlists">
-              <h2>Playlists</h2>
-              <div className="playlists-grid">
-                {/* TODO: Render user's playlists */}
-                {userPlaylists.length > 0 ? (
-                  userPlaylists.map(playlist => (
-                    <div key={playlist._id} className="playlist-item">
-                      <h3>{playlist.name}</h3>
-                      <p>{playlist.videos?.length} videos</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No playlists created yet</p>
-                )}
-              </div>
+          {activeTab === "Playlists" && (
+            <p className="text-gray-600">Public playlists will appear here.</p>
+          )}
+
+          {activeTab === "About" && (
+            <div className="max-w-xl text-sm text-gray-700 space-y-2">
+              <p>
+                Welcome to the YT-X Channel. This channel focuses on tech,
+                programming, and full-stack development.
+              </p>
+              <p>
+                📧 Business Email: ytx@business.com
+              </p>
+              <p>
+                🌍 Joined Jan 2024
+              </p>
             </div>
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;

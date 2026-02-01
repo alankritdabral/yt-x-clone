@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../styles/TweetFeedPage.css'
 
 // TODO: Fetch tweets from backend
 // TODO: Implement create new tweet

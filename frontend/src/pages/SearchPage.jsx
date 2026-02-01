@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../styles/SearchPage.css'
 import VideoCard from '../components/VideoCard'
 
 // TODO: Implement search query from URL params

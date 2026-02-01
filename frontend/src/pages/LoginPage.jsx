@@ -1,7 +1,9 @@
 import { useState } from "react";
-import "../styles/LoginPage.css";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = ({ setIsLoggedIn, setUser }) => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,79 +41,113 @@ const LoginPage = ({ setIsLoggedIn, setUser }) => {
 
       const data = await response.json();
 
+      // ✅ login success
       setIsLoggedIn(true);
       setUser(data.data.user);
+
+      // ✅ redirect to home
+      navigate("/");
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <h1>Login to YT-X Clone</h1>
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#F6F0D7] px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Login to <span className="text-red-600">YT-X</span>
+        </h1>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="mb-4 text-sm text-red-600 bg-red-100 px-4 py-2 rounded-lg">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleLogin} className="login-form">
-          <div className="form-group">
-            <label>Email Address</label>
+        <form onSubmit={handleLogin} className="space-y-4">
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Email Address
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <div className="password-input">
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Password
+            </label>
+            <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
+                className="w-full px-4 py-2 border rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="toggle-password"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
             </div>
           </div>
 
-          <div className="form-options">
-            <label>
-              <input type="checkbox" />
+          {/* Options */}
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" className="rounded" />
               Remember me
             </label>
-            <a href="#forgot-password">Forgot password?</a>
+            <a href="#" className="text-red-600 hover:underline">
+              Forgot password?
+            </a>
           </div>
 
-          <button type="submit" disabled={loading} className="login-btn">
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition disabled:opacity-60"
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <div className="social-login">
-          <p>Or login with:</p>
-          <button className="social-btn google-btn">Google</button>
-          <button className="social-btn github-btn">GitHub</button>
+        {/* Social login */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500 mb-3">Or login with</p>
+          <div className="flex gap-3">
+            <button className="flex-1 py-2 border rounded-lg hover:bg-gray-100">
+              Google
+            </button>
+            <button className="flex-1 py-2 border rounded-lg hover:bg-gray-100">
+              GitHub
+            </button>
+          </div>
         </div>
 
-        <div className="login-footer">
-          <p>
-            Don’t have an account? <a href="#register">Sign up here</a>
-          </p>
-        </div>
+        {/* Footer */}
+        <p className="mt-6 text-center text-sm">
+          Don’t have an account?{" "}
+          <a href="/register" className="text-red-600 hover:underline">
+            Sign up
+          </a>
+        </p>
       </div>
     </div>
   );

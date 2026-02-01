@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../styles/PlaylistPage.css'
 import VideoCard from '../components/VideoCard'
 
 // TODO: Fetch playlists from backend

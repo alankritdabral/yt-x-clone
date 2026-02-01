@@ -1,60 +1,64 @@
-import '../styles/Sidebar.css'
+// src/components/Sidebar.jsx
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Home,
+  Compass,
+  PlaySquare,
+  Clock,
+  ThumbsUp,
+} from "lucide-react";
 
-// TODO: Add active page highlighting
-// TODO: Add subscription list
+const sidebarItems = [
+  { label: "Home", icon: Home, path: "/" },
+  { label: "Explore", icon: Compass, path: "/search" },
+  { label: "Subscriptions", icon: PlaySquare, path: "/playlist/subscriptions" },
+  { label: "Watch Later", icon: Clock, path: "/playlist/watch-later" },
+  { label: "Liked Videos", icon: ThumbsUp, path: "/playlist/liked" },
+];
 
-const Sidebar = ({ setCurrentPage, sidebarOpen, setSidebarOpen }) => {
-  const handleMenuClick = (page) => {
-    setCurrentPage(page)
-    // Close sidebar on mobile/tablet after selecting
-    if (window.innerWidth < 1024) {
-      setSidebarOpen(false)
-    }
-  }
+const SidebarItem = ({ icon: Icon, label, active, onClick, sidebarOpen }) => (
+  <div
+    onClick={onClick}
+    className={`
+      flex items-center gap-5 px-4 py-2 mx-2 rounded-lg cursor-pointer
+      ${active ? "bg-gray-200 font-semibold" : "hover:bg-gray-100"}
+    `}
+  >
+    <Icon size={22} />
+    {sidebarOpen && <span className="text-sm">{label}</span>}
+  </div>
+);
+
+const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
-    <>
-      {/* Overlay backdrop when sidebar is open */}
-      {sidebarOpen && (
-        <div 
-          className="sidebar-overlay" 
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <aside
+      className={`
+        fixed top-14 left-0 h-[calc(100vh-56px)]
+        bg-white border-r border-gray-200
+        transition-all duration-300 z-40
+        ${sidebarOpen ? "w-56" : "w-20"}
+      `}
+    >
+      <div className="py-2">
+        {sidebarItems.map((item) => (
+          <SidebarItem
+            key={item.label}
+            icon={item.icon}
+            label={item.label}
+            sidebarOpen={sidebarOpen}
+            active={location.pathname === item.path}
+            onClick={() => {
+              navigate(item.path);
+              setSidebarOpen(false); // auto-close on mobile
+            }}
+          />
+        ))}
+      </div>
+    </aside>
+  );
+};
 
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-menu">
-          <button className="menu-item" onClick={() => handleMenuClick('home')}>
-            🏠 Home
-          </button>
-          <button className="menu-item" onClick={() => handleMenuClick('search')}>
-            🔍 Search
-          </button>
-          <button className="menu-item" onClick={() => handleMenuClick('tweets')}>
-            🐦 Tweets
-          </button>
-          <button className="menu-item" onClick={() => handleMenuClick('playlist')}>
-            📋 Playlists
-          </button>
-          <button className="menu-item" onClick={() => handleMenuClick('profile')}>
-            👤 Profile
-          </button>
-          <button className="menu-item" onClick={() => handleMenuClick('upload')}>
-            📤 Upload Video
-          </button>
-        </div>
-
-        {/* TODO: Add subscription section */}
-        <div className="sidebar-subscriptions">
-          <h3>Subscriptions</h3>
-          <ul className="subscription-list">
-            {/* TODO: Fetch and render subscribed channels */}
-          </ul>
-        </div>
-      </aside>
-    </>
-  )
-}
-
-export default Sidebar
+export default Sidebar;

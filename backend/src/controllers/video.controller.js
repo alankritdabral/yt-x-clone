@@ -45,21 +45,19 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   const totalVideos = await Video.countDocuments(filter);
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          videos,
-          page: pageNumber,
-          limit: limitNumber,
-          totalVideos,
-          totalPages: Math.ceil(totalVideos / limitNumber),
-        },
-        "Videos fetched successfully"
-      )
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        videos,
+        page: pageNumber,
+        limit: limitNumber,
+        totalVideos,
+        totalPages: Math.ceil(totalVideos / limitNumber),
+      },
+      "Videos fetched successfully"
+    )
+  );
 });
 
 /* ===========================

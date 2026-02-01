@@ -99,6 +99,11 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
+  if (req.user) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, req.user, "Already logged in"));
+  }
   // req body -> data
   // username or email
   //find the user

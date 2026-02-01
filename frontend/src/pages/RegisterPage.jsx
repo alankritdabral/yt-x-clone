@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import '../styles/RegisterPage.css'
 
 // TODO: Implement form validation (password strength, email format)
 // TODO: Add password confirmation matching
