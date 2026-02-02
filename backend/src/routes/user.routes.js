@@ -32,7 +32,7 @@ router.route("/register").post(
   registerUser
 );
 
-router.post("/login", alreadyLoggedIn, loginUser);
+router.post("/login", loginUser);
 
 //secured routes
 router.route("/logout").post(verifyJWT, logoutUser);

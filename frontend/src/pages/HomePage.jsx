@@ -40,7 +40,8 @@ const HomePage = () => {
     <div className="pt-4">
 
       {/* ===== VIDEOS GRID ===== */}
-      <div className="px-6 py-4">
+      <div className="px-6 py-4 max-w-[1600px] mx-auto">
+
         {loading ? (
           <div
             className="
@@ -63,13 +64,12 @@ const HomePage = () => {
         ) : videos.length > 0 ? (
           <div
             className="
-              grid gap-6
-              grid-cols-1
-              sm:grid-cols-2
-              md:grid-cols-3
-              lg:grid-cols-4
-              xl:grid-cols-5
-            "
+    grid gap-6
+    grid-cols-1
+    sm:grid-cols-2
+    md:grid-cols-4
+    [grid-template-columns:repeat(4,minmax(0,1fr))]
+  "
           >
             {videos.map((video) => (
               <VideoCard key={video._id} video={video} />

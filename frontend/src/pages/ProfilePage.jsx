@@ -1,43 +1,94 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import VideoCard from "../components/VideoCard"; // adjust path if needed
 
 const tabs = ["Home", "Videos", "Playlists", "About"];
 
-const videos = Array.from({ length: 12 }, (_, i) => ({
-  id: i,
-  title: `Sample Video Title ${i + 1}`,
-  views: `${Math.floor(Math.random() * 100)}K views`,
-  time: "2 days ago",
-  thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-}));
-
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("Home");
+  const [user, setUser] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch current user
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(
+        "http://localhost:8000/api/v1/users/current-user",
+        { credentials: "include" }
+      );
+
+      const result = await res.json();
+      setUser(result.data);
+
+      return result.data; // return user for next step
+    } catch (err) {
+      console.error("User fetch error:", err);
+    }
+  };
+
+  // Fetch videos of current user
+  const fetchVideos = async (userId) => {
+    try {
+      const res = await fetch(
+        "http://localhost:8000/api/v1/videos",
+        { credentials: "include" }
+      );
+
+      const result = await res.json();
+      const allVideos = result.data.videos || [];
+
+      const myVideos = allVideos.filter(
+        (v) => v.owner?._id === userId
+      );
+
+      setVideos(myVideos);
+    } catch (err) {
+      console.error("Videos fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const userData = await fetchUser();
+      if (userData?._id) {
+        await fetchVideos(userData._id);
+      }
+      setLoading(false);
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) return <div className="p-10">Loading...</div>;
 
   return (
     <div className="w-full bg-[#F6F0D7] min-h-screen">
-      {/* ===== Channel Banner ===== */}
+      {/* Banner */}
       <div className="h-48 md:h-60 bg-gray-300">
         <img
-          src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366"
-          alt="Channel Banner"
+          src={user?.coverImage}
+          alt="Banner"
           className="w-full h-full object-cover"
         />
       </div>
 
-      {/* ===== Channel Info ===== */}
+      {/* Channel Info */}
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between py-6 gap-4">
           <div className="flex items-center gap-5">
             <img
-              src="https://i.pravatar.cc/150"
+              src={user?.avatar}
               alt="Avatar"
-              className="w-24 h-24 rounded-full"
+              className="w-24 h-24 rounded-full object-cover"
             />
 
             <div>
-              <h1 className="text-2xl font-bold">YT-X Channel</h1>
+              <h1 className="text-2xl font-bold">
+                {user?.fullName}
+              </h1>
+
               <p className="text-sm text-gray-600">
-                @ytx • 120K subscribers • 45 videos
+                @{user?.username} • {videos.length} videos
               </p>
             </div>
           </div>
@@ -47,67 +98,43 @@ const ProfilePage = () => {
           </button>
         </div>
 
-        {/* ===== Tabs ===== */}
+        {/* Tabs */}
         <div className="border-b border-gray-300 flex gap-6 text-sm font-medium">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 ${
-                activeTab === tab
+              className={`pb-3 ${activeTab === tab
                   ? "border-b-2 border-black text-black"
                   : "text-gray-500 hover:text-black"
-              }`}
+                }`}
             >
               {tab}
             </button>
           ))}
         </div>
 
-        {/* ===== Content ===== */}
+        {/* Content */}
         <div className="py-6">
-          {activeTab === "Home" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {videos.map((video) => (
-                <div key={video.id} className="cursor-pointer">
-                  <div className="aspect-video bg-gray-200 rounded-xl overflow-hidden">
-                    <img
-                      src={video.thumbnail}
-                      alt={video.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+          {(activeTab === "Home" ||
+            activeTab === "Videos") && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
-                  <h3 className="mt-2 text-sm font-semibold line-clamp-2">
-                    {video.title}
-                  </h3>
-                  <p className="text-xs text-gray-600">
-                    {video.views} • {video.time}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
 
-          {activeTab === "Videos" && (
-            <p className="text-gray-600">All uploaded videos will appear here.</p>
-          )}
-
-          {activeTab === "Playlists" && (
-            <p className="text-gray-600">Public playlists will appear here.</p>
-          )}
+                {videos.map((video) => (
+                  <VideoCard key={video._id} video={video} />
+                ))}
+              </div>
+            )}
 
           {activeTab === "About" && (
             <div className="max-w-xl text-sm text-gray-700 space-y-2">
+              <p>Email: {user?.email}</p>
               <p>
-                Welcome to the YT-X Channel. This channel focuses on tech,
-                programming, and full-stack development.
-              </p>
-              <p>
-                📧 Business Email: ytx@business.com
-              </p>
-              <p>
-                🌍 Joined Jan 2024
+                Joined:{" "}
+                {new Date(
+                  user?.createdAt
+                ).toLocaleDateString()}
               </p>
             </div>
           )}

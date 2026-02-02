@@ -2,7 +2,7 @@
 import { Menu, Search, Bell, Video, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
+const Navbar = ({ sidebarOpen, setSidebarOpen, user }) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-gray-200">
       <div className="flex items-center justify-between h-full px-4">
@@ -16,33 +16,35 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
           </button>
 
           <div className="flex items-center gap-1 cursor-pointer">
-            <svg
-              width="40"
-              viewBox="0 0 512 320"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8"
-            >
-              <rect x="56" y="40" width="400" height="240" rx="60" fill="#FF0000" />
+            <Link to="/" className="p-2 rounded-full hover:bg-gray-100">
+              <svg
+                width="40"
+                viewBox="0 0 512 320"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8"
+              >
+                <rect x="56" y="40" width="400" height="240" rx="60" fill="#FF0000" />
 
-              <line
-                x1="196"
-                y1="110"
-                x2="316"
-                y2="210"
-                stroke="#FFFFFF"
-                strokeWidth="28"
-                strokeLinecap="round"
-              />
-              <line
-                x1="316"
-                y1="110"
-                x2="196"
-                y2="210"
-                stroke="#FFFFFF"
-                strokeWidth="28"
-                strokeLinecap="round"
-              />
-            </svg>
+                <line
+                  x1="196"
+                  y1="110"
+                  x2="316"
+                  y2="210"
+                  stroke="#FFFFFF"
+                  strokeWidth="28"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="316"
+                  y1="110"
+                  x2="196"
+                  y2="210"
+                  stroke="#FFFFFF"
+                  strokeWidth="28"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
 
@@ -73,12 +75,18 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
           </button>
 
           <button className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
-            <User size={18} />
+            <Link
+              to={`/profile/${user?._id}`}
+              className="p-2 rounded-full hover:bg-gray-100"
+            >
+              <User size={18} />
+            </Link>
+
           </button>
         </div>
 
       </div>
-    </nav>
+    </nav >
   );
 };
 
