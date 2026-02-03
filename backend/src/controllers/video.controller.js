@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Like } from "../models/like.models.js";
 
 /* ===========================
    Get All Videos
@@ -116,14 +117,30 @@ const getVideoById = asyncHandler(async (req, res) => {
 
   if (
     !video ||
-    (!video.isPublished && video.owner.toString() !== req.user._id.toString())
+    (!video.isPublished &&
+      video.owner._id.toString() !== req.user._id.toString())
   ) {
     throw new ApiError(404, "Video not found");
   }
 
+  /* ---------- COUNT LIKES ---------- */
+  const likesCount = await Like.countDocuments({
+    video: video._id,
+  });
+
+  /* ---------- CHECK USER LIKE ---------- */
+  const userLike = await Like.findOne({
+    video: video._id,
+    likedBy: req.user._id,
+  });
+
+  const responseVideo = video.toObject();
+  responseVideo.likesCount = likesCount;
+  responseVideo.isLiked = !!userLike;
+
   return res
     .status(200)
-    .json(new ApiResponse(200, video, "Video fetched successfully"));
+    .json(new ApiResponse(200, responseVideo, "Video fetched successfully"));
 });
 
 /* ===========================
