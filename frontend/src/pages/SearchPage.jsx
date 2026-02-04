@@ -1,72 +1,94 @@
-import { useState, useEffect } from 'react'
-import VideoCard from '../components/VideoCard'
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import VideoCard from "../components/VideoCard";
 
-// TODO: Implement search query from URL params
-// TODO: Add filters (date, duration, upload date, etc.)
-// TODO: Add sort options
-// TODO: Implement pagination
-// TODO: Add search suggestions/autocomplete
+const API = "http://localhost:8000/api/v1";
 
 const SearchPage = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [filterType, setFilterType] = useState('all')
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("q") || ""
+  );
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filterType, setFilterType] = useState("video");
+
+  /* ===============================
+     Perform Search
+  =============================== */
   useEffect(() => {
-    // TODO: Fetch search results from /api/search?q=query
-    const performSearch = async () => {
-      if (!searchQuery) return
-      try {
-        setLoading(true)
-        const response = await fetch(`/api/search?q=${searchQuery}&type=${filterType}`)
-        const data = await response.json()
-        setResults(data.data)
-      } catch (error) {
-        console.error('Error searching:', error)
-      } finally {
-        setLoading(false)
-      }
+    if (!searchQuery.trim()) {
+      setResults([]);
+      return;
     }
-    performSearch()
-  }, [searchQuery, filterType])
+
+    const timer = setTimeout(async () => {
+      try {
+        setLoading(true);
+
+        // update URL
+        setSearchParams({ q: searchQuery });
+
+        const response = await fetch(
+          `${API}/search?q=${searchQuery}&type=${filterType}`
+        );
+
+        const data = await response.json();
+
+        // API returns data.data
+        setResults(data?.data || []);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, 400); // debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, filterType, setSearchParams]);
 
   return (
-    <div className="search-page">
-      <div className="search-filters">
+    <div className="p-4">
+      {/* ================= Filters ================= */}
+      <div className="flex gap-3 mb-4">
         <input
           type="text"
-          className="search-input"
-          placeholder="Search videos, users, tweets..."
+          className="border p-2 flex-1 rounded"
+          placeholder="Search videos..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-          <option value="all">All</option>
+
+        <select
+          className="border p-2 rounded"
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+        >
           <option value="video">Videos</option>
+          <option value="all">All</option>
           <option value="user">Users</option>
           <option value="tweet">Tweets</option>
           <option value="playlist">Playlists</option>
         </select>
       </div>
 
-      <div className="search-results">
-        {loading ? (
-          <p>Searching...</p>
-        ) : results.length > 0 ? (
-          <div className="results-grid">
-            {results.map((result) => (
-              <VideoCard key={result._id} video={result} />
-            ))}
-          </div>
-        ) : searchQuery ? (
-          <p>No results found for "{searchQuery}"</p>
-        ) : (
-          <p>Start typing to search</p>
-        )}
-      </div>
+      {/* ================= Results ================= */}
+      {loading ? (
+        <p>Searching...</p>
+      ) : results.length > 0 ? (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {results.map((result) => (
+            <VideoCard key={result._id} video={result} />
+          ))}
+        </div>
+      ) : searchQuery ? (
+        <p>No results found for "{searchQuery}"</p>
+      ) : (
+        <p>Start typing to search</p>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default SearchPage
+export default SearchPage;

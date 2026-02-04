@@ -23,16 +23,18 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Video not found");
   }
 
-  // remove like if exists
   const deleted = await Like.findOneAndDelete({
-    user: userId,
+    likedBy: userId,
     video: videoId,
   });
 
   const liked = !deleted;
 
   if (liked) {
-    await Like.create({ user: userId, video: videoId });
+    await Like.create({
+      likedBy: userId,
+      video: videoId,
+    });
   }
 
   const likesCount = await Like.countDocuments({ video: videoId });
@@ -56,15 +58,23 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid commentId");
   }
 
+  const commentExists = await Comment.exists({ _id: commentId });
+  if (!commentExists) {
+    throw new ApiError(404, "Comment not found");
+  }
+
   const deleted = await Like.findOneAndDelete({
-    user: userId,
+    likedBy: userId,
     comment: commentId,
   });
 
   const liked = !deleted;
 
   if (liked) {
-    await Like.create({ user: userId, comment: commentId });
+    await Like.create({
+      likedBy: userId,
+      comment: commentId,
+    });
   }
 
   const likesCount = await Like.countDocuments({
@@ -96,19 +106,29 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   }
 
   const deleted = await Like.findOneAndDelete({
-    user: userId,
+    likedBy: userId,
     tweet: tweetId,
   });
 
-  if (deleted) {
-    return res
-      .status(200)
-      .json(new ApiResponse(200, "Tweet unliked successfully"));
+  const liked = !deleted;
+
+  if (liked) {
+    await Like.create({
+      likedBy: userId,
+      tweet: tweetId,
+    });
   }
 
-  await Like.create({ user: userId, tweet: tweetId });
+  const likesCount = await Like.countDocuments({
+    tweet: tweetId,
+  });
 
-  return res.status(200).json(new ApiResponse(200, "Tweet liked successfully"));
+  return res.status(200).json(
+    new ApiResponse(200, {
+      liked,
+      likesCount,
+    })
+  );
 });
 
 /* ===========================
@@ -120,7 +140,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
   const likedVideos = await Like.aggregate([
     {
       $match: {
-        user: userId,
+        likedBy: userId,
         video: { $ne: null },
       },
     },
@@ -139,11 +159,18 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     { $sort: { createdAt: -1 } },
   ]);
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, likedVideos, "Liked videos fetched successfully")
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      likedVideos,
+      "Liked videos fetched successfully"
+    )
+  );
 });
 
-export { toggleVideoLike, toggleCommentLike, toggleTweetLike, getLikedVideos };
+export {
+  toggleVideoLike,
+  toggleCommentLike,
+  toggleTweetLike,
+  getLikedVideos,
+};

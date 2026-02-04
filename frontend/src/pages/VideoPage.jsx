@@ -15,6 +15,9 @@ const VideoPage = () => {
   const [likesCount, setLikesCount] = useState(0);
 
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribersCount, setSubscribersCount] = useState(0);
+
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   /* ---------------- Fetch Video & Comments ---------------- */
   useEffect(() => {
@@ -23,14 +26,25 @@ const VideoPage = () => {
         const videoRes = await fetch(`${API}/videos/${videoId}`, {
           credentials: "include",
         });
-        const videoData = await videoRes.json();
 
+        const videoData = await videoRes.json();
         const videoInfo = videoData.data;
 
         setVideo(videoInfo);
         setLikesCount(videoInfo?.likesCount || 0);
         setLiked(videoInfo?.isLiked || false);
         setSubscribed(videoInfo?.isSubscribed || false);
+
+        // fetch subscribers count
+        if (videoInfo?.owner?._id) {
+          const subRes = await fetch(
+            `${API}/subscriptions/u/${videoInfo.owner._id}`,
+            { credentials: "include" }
+          );
+
+          const subData = await subRes.json();
+          setSubscribersCount(subData.data?.length || 0);
+        }
 
         const commentRes = await fetch(`${API}/comments/${videoId}`, {
           credentials: "include",
@@ -53,9 +67,7 @@ const VideoPage = () => {
     const nextLiked = !liked;
 
     setLiked(nextLiked);
-    setLikesCount((c) =>
-      nextLiked ? c + 1 : Math.max(c - 1, 0)
-    );
+    setLikesCount((c) => (nextLiked ? c + 1 : Math.max(c - 1, 0)));
 
     try {
       const res = await fetch(
@@ -68,9 +80,7 @@ const VideoPage = () => {
       setLikesCount(data.data.likesCount);
     } catch {
       setLiked(!nextLiked);
-      setLikesCount((c) =>
-        nextLiked ? c - 1 : c + 1
-      );
+      setLikesCount((c) => (nextLiked ? c - 1 : c + 1));
     }
   };
 
@@ -79,6 +89,9 @@ const VideoPage = () => {
     if (!video?.owner?._id) return;
 
     setSubscribed((s) => !s);
+    setSubscribersCount((c) =>
+      subscribed ? Math.max(c - 1, 0) : c + 1
+    );
 
     await fetch(
       `${API}/subscriptions/c/${video.owner._id}`,
@@ -110,9 +123,7 @@ const VideoPage = () => {
       credentials: "include",
     });
 
-    setComments((prev) =>
-      prev.filter((c) => c._id !== id)
-    );
+    setComments((prev) => prev.filter((c) => c._id !== id));
   };
 
   /* ---------------- Like Comment ---------------- */
@@ -144,9 +155,19 @@ const VideoPage = () => {
     ? video.videoFile
     : `http://localhost:8000${video.videoFile}`;
 
+  const formattedDate = new Date(
+    video.createdAt
+  ).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  const shortDescription = video.description?.slice(0, 150);
+
   return (
     <div className="max-w-5xl mx-auto px-4 mt-4">
-      {/* Video */}
+      {/* Video Player */}
       <video
         src={videoUrl}
         controls
@@ -159,18 +180,9 @@ const VideoPage = () => {
         {video.title}
       </h1>
 
-      {/* Actions */}
-      <div className="flex gap-3 mt-2">
-        <button
-          onClick={toggleLike}
-          className="px-4 py-1.5 bg-gray-200 rounded-full"
-        >
-          {liked ? "👍 Liked" : "👍 Like"} ({likesCount})
-        </button>
-      </div>
-
-      {/* Channel */}
-      <div className="flex justify-between items-center mt-4 border-b pb-4">
+      {/* Channel + Actions Row */}
+      <div className="flex flex-wrap justify-between items-center mt-3 gap-4 border-b pb-4">
+        {/* LEFT: Channel */}
         <div className="flex items-center gap-3">
           <img
             src={
@@ -181,23 +193,64 @@ const VideoPage = () => {
             alt=""
           />
 
-          <p className="font-semibold">
-            {video.owner?.username}
-          </p>
+          <div>
+            <p className="font-semibold text-left">
+              {video.owner?.username}
+            </p>
+            <p className="text-sm text-gray-500">
+              {subscribersCount} subscribers
+            </p>
+          </div>
+
+          {/* Subscribe */}
+          <button
+            onClick={toggleSubscribe}
+            className={`ml-4 px-4 py-2 rounded-full text-white ${subscribed ? "bg-gray-500" : "bg-black"
+              }`}
+          >
+            {subscribed ? "Subscribed" : "Subscribe"}
+          </button>
         </div>
 
-        <button
-          onClick={toggleSubscribe}
-          className={`px-4 py-2 rounded-full text-white ${subscribed ? "bg-gray-500" : "bg-black"
-            }`}
-        >
-          {subscribed ? "Subscribed" : "Subscribe"}
-        </button>
+        {/* RIGHT: Actions */}
+        <div className="flex gap-3 flex-wrap">
+          <button
+            onClick={toggleLike}
+            className="px-4 py-2 bg-gray-200 rounded-full"
+          >
+            {liked ? "👍 Liked" : "👍 Like"} ({likesCount})
+          </button>
+
+          <button className="px-4 py-2 bg-gray-200 rounded-full">
+            ➕ Playlist
+          </button>
+
+          <button className="px-4 py-2 bg-gray-200 rounded-full">
+            🔗 Share
+          </button>
+        </div>
       </div>
 
       {/* Description */}
       <div className="bg-gray-100 rounded-xl p-4 mt-4">
-        {video.description}
+        <p className="text-sm text-gray-600 mb-2">
+          Uploaded on {formattedDate}
+        </p>
+
+        <p>
+          {showFullDesc
+            ? video.description
+            : shortDescription}
+        </p>
+
+        {video.description?.length > 150 && (
+          <button
+            className="mt-2 text-sm font-semibold"
+            onClick={() => setShowFullDesc(!showFullDesc)}
+          >
+            {showFullDesc ? "Show less" : "Show more"}
+          </button>
+        )}
       </div>
 
       {/* Comments */}
@@ -206,12 +259,11 @@ const VideoPage = () => {
           {comments.length} Comments
         </h2>
 
+        {/* Add comment */}
         <div className="flex gap-2 mb-4">
           <input
             value={newComment}
-            onChange={(e) =>
-              setNewComment(e.target.value)
-            }
+            onChange={(e) => setNewComment(e.target.value)}
             className="flex-1 border rounded-full px-4 py-2"
             placeholder="Add comment..."
           />
@@ -224,6 +276,7 @@ const VideoPage = () => {
           </button>
         </div>
 
+        {/* Comment list */}
         <div className="space-y-4">
           {comments.map((c) => (
             <div key={c._id} className="flex gap-3">
@@ -260,6 +313,7 @@ const VideoPage = () => {
       </div>
     </div>
   );
+
 };
 
 export default VideoPage;
