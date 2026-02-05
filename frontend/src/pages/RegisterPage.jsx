@@ -1,167 +1,246 @@
-import { useState } from 'react'
-
-// TODO: Implement form validation (password strength, email format)
-// TODO: Add password confirmation matching
-// TODO: Implement terms and conditions checkbox
-// TODO: Add error handling and display
-// TODO: Implement email verification
-// TODO: Add password requirements display
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreeToTerms: false
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
+  });
+
+  const [avatar, setAvatar] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
-  }
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const handleRegister = async (e) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    if (loading) return;
 
-    // TODO: Validate form data
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
+    setError("");
+
+    if (!avatar) {
+      return setError("Avatar is required");
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long')
-      return
+    if (formData.password !== formData.confirmPassword) {
+      return setError("Passwords do not match");
     }
 
     if (!formData.agreeToTerms) {
-      setError('You must agree to the terms and conditions')
-      return
+      return setError("Please agree to terms");
     }
 
-    // TODO: Send registration request to / api / users / register
     try {
-      setLoading(true)
-      const response = await fetch('/api/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
-        })
-      })
-      const data = await response.json()
-      if (data.success) {
-        // TODO: Redirect to login page
-      } else {
-        setError(data.message)
+      setLoading(true);
+
+      const data = new FormData();
+      data.append("fullName", formData.fullName);
+      data.append("username", formData.username);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("avatar", avatar);
+
+      if (coverImage) {
+        data.append("coverImage", coverImage);
       }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/register`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Registration failed");
+      }
+
+      alert("Account created successfully!");
+      navigate("/login");
     } catch (err) {
-      setError('Registration failed. Please try again.')
+      setError(err.message || "Something went wrong");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="register-page">
-      <div className="register-container">
-        <h1>Create Account</h1>
-        <p>Join YT-X Clone and start sharing</p>
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-[#F6F0D7] px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 overflow-y-auto max-h-[95vh]">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Join <span className="text-red-600">YT-X</span>
+        </h1>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="mb-4 text-sm text-red-600 bg-red-100 px-4 py-2 rounded-lg">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleRegister} className="register-form">
-          <div className="form-group">
-            <label>Username</label>
+        <form onSubmit={handleRegister} className="space-y-4">
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Full Name
+            </label>
             <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              placeholder="Choose a username"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="Enter full name"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
               required
             />
           </div>
 
-          <div className="form-group">
-            <label>Email Address</label>
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Username
+            </label>
+            <input
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Choose username"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your email"
+              onChange={handleChange}
+              placeholder="Enter email"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
               required
             />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <div className="password-input">
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Password
+            </label>
+
+            <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
-                onChange={handleInputChange}
-                placeholder="Create a strong password"
+                onChange={handleChange}
+                placeholder="Create password"
+                className="w-full px-4 py-2 border rounded-lg pr-10 focus:ring-2 focus:ring-red-500 outline-none"
                 required
               />
+
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="toggle-password"
+                onClick={() => setShowPassword((p) => !p)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? "🙈" : "👁️"}
               </button>
             </div>
-            <small>Min 6 characters</small>
           </div>
 
-          <div className="form-group">
-            <label>Confirm Password</label>
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Confirm Password
+            </label>
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               name="confirmPassword"
               value={formData.confirmPassword}
-              onChange={handleInputChange}
-              placeholder="Confirm your password"
+              onChange={handleChange}
+              placeholder="Confirm password"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
               required
             />
           </div>
 
-          <div className="form-group checkbox">
-            <label>
-              <input
-                type="checkbox"
-                name="agreeToTerms"
-                checked={formData.agreeToTerms}
-                onChange={handleInputChange}
-              />
-              I agree to the <a href="#terms">Terms and Conditions</a>
+          {/* Avatar */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Avatar (required)
             </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setAvatar(e.target.files[0])}
+              required
+            />
           </div>
 
-          <button type="submit" disabled={loading} className="register-btn">
-            {loading ? 'Creating Account...' : 'Sign Up'}
+          {/* Cover */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Cover Image (optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setCoverImage(e.target.files[0])}
+            />
+          </div>
+
+          {/* Terms */}
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={formData.agreeToTerms}
+              onChange={handleChange}
+            />
+            Agree to Terms & Conditions
+          </label>
+
+          {/* Submit */}
+          <button
+            disabled={loading}
+            className="w-full py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition disabled:opacity-60"
+          >
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
 
-        <div className="register-footer">
-          <p>Already have an account? <a href="#login">Login here</a></p>
-        </div>
+        <p className="mt-6 text-center text-sm">
+          Already have an account?{" "}
+          <a href="/login" className="text-red-600 hover:underline">
+            Login here
+          </a>
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;

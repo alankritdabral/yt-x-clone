@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Like } from "../models/like.models.js";
+import { View } from "../models/view.models.js";
 
 /* ===========================
    Get All Videos
@@ -226,6 +227,38 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     );
 });
 
+/* ===========================
+   Register View
+=========================== */
+const registerView = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid videoId");
+  }
+
+  const sessionId =
+    req.cookies?.sessionId || req.headers["x-session-id"] || req.ip;
+
+  const viewer = req.user?._id || null;
+
+  try {
+    await View.create({
+      video: videoId,
+      viewer,
+      sessionId,
+    });
+
+    await Video.findByIdAndUpdate(videoId, {
+      $inc: { views: 1 },
+    });
+  } catch (err) {
+    /* Duplicate view ignored */
+  }
+
+  return res.status(200).json(new ApiResponse(200, null, "View counted"));
+});
+
 export {
   getAllVideos,
   publishAVideo,
@@ -233,4 +266,5 @@ export {
   updateVideo,
   deleteVideo,
   togglePublishStatus,
+  registerView,
 };

@@ -15,6 +15,7 @@ import {
 import { upload } from "../middlewares/multer.middleware.js";
 import { alreadyLoggedIn } from "../middlewares/alreadyLoggedIn.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { addToWatchHistory } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -50,5 +51,6 @@ router
 
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
+router.post("/history/:videoId", verifyJWT, addToWatchHistory);
 
 export default router;

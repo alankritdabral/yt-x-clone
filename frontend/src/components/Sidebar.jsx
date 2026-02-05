@@ -11,9 +11,9 @@ import {
 const sidebarItems = [
   { label: "Home", icon: Home, path: "/" },
   { label: "Explore", icon: Compass, path: "/search" },
-  { label: "Subscriptions", icon: PlaySquare, path: "/playlist/subscriptions" },
-  { label: "Watch Later", icon: Clock, path: "/playlist/watch-later" },
-  { label: "Liked Videos", icon: ThumbsUp, path: "/playlist/liked" },
+  { label: "Playlist", icon: PlaySquare, path: "/playlist/subscriptions" },
+  { label: "Watch History", icon: Clock, path: "/history" },
+  { label: "Liked Videos", icon: ThumbsUp, path: "/liked-videos" },
 ];
 
 const SidebarItem = ({ icon: Icon, label, active, onClick, sidebarOpen }) => (

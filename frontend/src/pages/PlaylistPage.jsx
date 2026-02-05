@@ -16,15 +16,27 @@ const PlaylistPage = () => {
   const fetchPlaylists = async () => {
     try {
       setLoading(true);
+
       const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user?._id) return;
+
       const res = await fetch(`${API}/user/${user._id}`, {
         credentials: "include",
       });
 
       const data = await res.json();
-      setPlaylists(data.data || []);
+      const list = data.data || [];
+
+      setPlaylists(list);
+
+      if (list.length > 0) {
+        fetchPlaylistDetails(list[0]._id);
+      } else {
+        setSelectedPlaylist(null);
+      }
     } catch (err) {
-      console.error("Fetch playlists error:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -35,7 +47,7 @@ const PlaylistPage = () => {
   }, []);
 
   /* ===========================
-     Fetch Playlist Details
+     Playlist Details
   =========================== */
   const fetchPlaylistDetails = async (playlistId) => {
     try {
@@ -46,7 +58,7 @@ const PlaylistPage = () => {
       const data = await res.json();
       setSelectedPlaylist(data.data);
     } catch (err) {
-      console.error("Fetch playlist error:", err);
+      console.error(err);
     }
   };
 
@@ -60,19 +72,15 @@ const PlaylistPage = () => {
       await fetch(API, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: newPlaylistName,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newPlaylistName }),
       });
 
       setNewPlaylistName("");
       setShowCreateForm(false);
       fetchPlaylists();
     } catch (err) {
-      console.error("Create playlist error:", err);
+      console.error(err);
     }
   };
 
@@ -86,93 +94,96 @@ const PlaylistPage = () => {
         credentials: "include",
       });
 
-      if (selectedPlaylist?._id === playlistId) {
-        setSelectedPlaylist(null);
-      }
-
       fetchPlaylists();
     } catch (err) {
-      console.error("Delete playlist error:", err);
+      console.error(err);
     }
   };
 
   return (
-    <div className="playlist-page p-4">
-      <div className="playlist-header flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">My Playlists</h1>
+    <div className="min-h-screen bg-white text-black">
+      {/* Header */}
+      <div className="flex justify-between items-center px-6 py-4 border-b">
+        <h1 className="text-2xl font-semibold">Playlists</h1>
+
         <button
           onClick={() => setShowCreateForm(true)}
-          className="bg-black text-white px-3 py-1 rounded"
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
         >
-          + Create Playlist
+          Create Playlist
         </button>
       </div>
 
+      {/* Create Form */}
       {showCreateForm && (
-        <div className="mb-4 flex gap-2">
+        <div className="p-4 border-b flex gap-2">
           <input
             type="text"
-            placeholder="Enter playlist name"
+            placeholder="Playlist name"
             value={newPlaylistName}
             onChange={(e) => setNewPlaylistName(e.target.value)}
-            className="border p-2 rounded w-64"
+            className="border px-3 py-2 rounded w-64"
           />
+
           <button
             onClick={handleCreatePlaylist}
-            className="bg-green-600 text-white px-3 rounded"
+            className="bg-green-600 text-white px-4 rounded"
           >
             Create
           </button>
+
           <button
             onClick={() => setShowCreateForm(false)}
-            className="bg-gray-300 px-3 rounded"
+            className="bg-gray-300 px-4 rounded"
           >
             Cancel
           </button>
         </div>
       )}
 
-      {loading ? (
-        <p>Loading playlists...</p>
-      ) : (
-        <div className="playlists-container flex gap-6">
-          {/* Playlist list */}
-          <div className="playlists-list w-64 border-r pr-4">
-            {playlists.map((playlist) => (
-              <div
-                key={playlist._id}
-                className={`p-3 mb-2 border rounded cursor-pointer ${selectedPlaylist?._id === playlist._id
-                    ? "bg-gray-200"
-                    : ""
-                  }`}
-                onClick={() => fetchPlaylistDetails(playlist._id)}
+      {/* Body */}
+      <div className="flex">
+        {/* Sidebar playlists */}
+        <div className="w-72 border-r h-[calc(100vh-120px)] overflow-y-auto p-4">
+          {loading && <p>Loading...</p>}
+
+          {playlists.map((playlist) => (
+            <div
+              key={playlist._id}
+              onClick={() => fetchPlaylistDetails(playlist._id)}
+              className={`p-3 mb-2 rounded cursor-pointer hover:bg-gray-100 ${selectedPlaylist?._id === playlist._id
+                  ? "bg-gray-200"
+                  : ""
+                }`}
+            >
+              <h3 className="font-medium">{playlist.name}</h3>
+
+              <p className="text-sm text-gray-500">
+                {playlist.videos?.length || 0} videos
+              </p>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeletePlaylist(playlist._id);
+                }}
+                className="text-red-600 text-sm mt-1"
               >
-                <h3 className="font-medium">{playlist.name}</h3>
-                <p className="text-sm text-gray-600">
-                  {playlist.videos?.length || 0} videos
-                </p>
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
 
-                <button
-                  className="text-red-600 text-sm mt-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeletePlaylist(playlist._id);
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Playlist videos */}
-          {selectedPlaylist && (
-            <div className="playlist-videos flex-1">
-              <h2 className="text-xl font-semibold mb-4">
+        {/* Playlist Videos */}
+        <div className="flex-1 p-6">
+          {selectedPlaylist ? (
+            <>
+              <h2 className="text-xl font-semibold mb-6">
                 {selectedPlaylist.name}
               </h2>
 
-              <div className="videos-grid grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {selectedPlaylist.videos?.length > 0 ? (
                   selectedPlaylist.videos.map((video) => (
                     <VideoCard key={video._id} video={video} />
@@ -181,10 +192,12 @@ const PlaylistPage = () => {
                   <p>No videos in this playlist</p>
                 )}
               </div>
-            </div>
+            </>
+          ) : (
+            <p>Select a playlist</p>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

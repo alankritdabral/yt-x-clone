@@ -24,12 +24,17 @@ const Navbar = ({ sidebarOpen, setSidebarOpen, user }) => {
   /* ======================
      Avatar URL
   ====================== */
-  const avatarUrl =
-    user?.avatar && user.avatar.startsWith("http")
-      ? user.avatar
-      : user?.avatar
-        ? `${API_BASE}${user.avatar}`
-        : null;
+  const avatarUrl = (() => {
+    if (!user?.avatar) return null;
+
+    if (user.avatar.startsWith("http")) {
+      return user.avatar;
+    }
+
+    return `${API_BASE}${user.avatar.startsWith("/") ? "" : "/"
+      }${user.avatar}`;
+  })();
+
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-gray-200">

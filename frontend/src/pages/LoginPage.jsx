@@ -41,12 +41,14 @@ const LoginPage = ({ setIsLoggedIn, setUser }) => {
 
       const data = await response.json();
 
-      // ✅ login success
+
       setIsLoggedIn(true);
       setUser(data.data.user);
 
-      // ✅ redirect to home
+      localStorage.setItem("user", JSON.stringify(data.data.user));
+
       navigate("/");
+
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {

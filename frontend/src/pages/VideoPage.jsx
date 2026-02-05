@@ -19,7 +19,10 @@ const VideoPage = () => {
 
   const [showFullDesc, setShowFullDesc] = useState(false);
 
-  /* ---------------- Fetch Video & Comments ---------------- */
+  const [showPlaylistPopup, setShowPlaylistPopup] = useState(false);
+  const [playlists, setPlaylists] = useState([]);
+
+  /* ---------------- Fetch Data ---------------- */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,10 +38,10 @@ const VideoPage = () => {
         setLiked(videoInfo?.isLiked || false);
         setSubscribed(videoInfo?.isSubscribed || false);
 
-        // fetch subscribers count
+        /* Subscriber count */
         if (videoInfo?.owner?._id) {
           const subRes = await fetch(
-            `${API}/subscriptions/u/${videoInfo.owner._id}`,
+            `${API}/subscriptions/c/${videoInfo.owner._id}`,
             { credentials: "include" }
           );
 
@@ -46,12 +49,27 @@ const VideoPage = () => {
           setSubscribersCount(subData.data?.length || 0);
         }
 
+        /* Comments */
         const commentRes = await fetch(`${API}/comments/${videoId}`, {
           credentials: "include",
         });
 
         const commentData = await commentRes.json();
         setComments(commentData.data?.comments || []);
+
+        /* History */
+        await fetch(`${API}/users/history/${videoId}`, {
+          method: "POST",
+          credentials: "include",
+        });
+        // View Count
+        if (!videoId) return;
+
+        fetch(`${API}/videos/view/${videoId}`, {
+          method: "POST",
+          credentials: "include",
+        });
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -62,12 +80,41 @@ const VideoPage = () => {
     fetchData();
   }, [videoId]);
 
-  /* ---------------- Toggle Video Like ---------------- */
-  const toggleLike = async () => {
-    const nextLiked = !liked;
+  /* ---------------- Playlist ---------------- */
+  const openPlaylistPopup = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?._id) return;
 
-    setLiked(nextLiked);
-    setLikesCount((c) => (nextLiked ? c + 1 : Math.max(c - 1, 0)));
+      const res = await fetch(
+        `${API}/playlist/user/${user._id}`,
+        { credentials: "include" }
+      );
+
+      const data = await res.json();
+      setPlaylists(data.data || []);
+      setShowPlaylistPopup(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addToPlaylist = async (playlistId) => {
+    await fetch(
+      `${API}/playlist/${playlistId}/videos/${videoId}`,
+      { method: "PATCH", credentials: "include" }
+    );
+
+    alert("Added to playlist");
+    setShowPlaylistPopup(false);
+  };
+
+  /* ---------------- Video Like ---------------- */
+  const toggleLike = async () => {
+    const prev = liked;
+
+    setLiked(!prev);
+    setLikesCount((c) => (prev ? Math.max(c - 1, 0) : c + 1));
 
     try {
       const res = await fetch(
@@ -79,24 +126,29 @@ const VideoPage = () => {
       setLiked(data.data.liked);
       setLikesCount(data.data.likesCount);
     } catch {
-      setLiked(!nextLiked);
-      setLikesCount((c) => (nextLiked ? c - 1 : c + 1));
+      setLiked(prev);
     }
   };
 
-  /* ---------------- Subscription ---------------- */
+  /* ---------------- Subscribe ---------------- */
   const toggleSubscribe = async () => {
     if (!video?.owner?._id) return;
 
-    setSubscribed((s) => !s);
+    const prev = subscribed;
+
+    setSubscribed(!prev);
     setSubscribersCount((c) =>
-      subscribed ? Math.max(c - 1, 0) : c + 1
+      prev ? Math.max(c - 1, 0) : c + 1
     );
 
-    await fetch(
-      `${API}/subscriptions/c/${video.owner._id}`,
-      { method: "POST", credentials: "include" }
-    );
+    try {
+      await fetch(
+        `${API}/subscriptions/c/${video.owner._id}`,
+        { method: "POST", credentials: "include" }
+      );
+    } catch {
+      setSubscribed(prev);
+    }
   };
 
   /* ---------------- Add Comment ---------------- */
@@ -126,7 +178,7 @@ const VideoPage = () => {
     setComments((prev) => prev.filter((c) => c._id !== id));
   };
 
-  /* ---------------- Like Comment ---------------- */
+  /* ---------------- Comment Like ---------------- */
   const toggleCommentLike = async (id) => {
     setComments((prev) =>
       prev.map((c) =>
@@ -155,19 +207,9 @@ const VideoPage = () => {
     ? video.videoFile
     : `http://localhost:8000${video.videoFile}`;
 
-  const formattedDate = new Date(
-    video.createdAt
-  ).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-
-  const shortDescription = video.description?.slice(0, 150);
-
   return (
     <div className="max-w-5xl mx-auto px-4 mt-4">
-      {/* Video Player */}
+      {/* Video */}
       <video
         src={videoUrl}
         controls
@@ -180,21 +222,17 @@ const VideoPage = () => {
         {video.title}
       </h1>
 
-      {/* Channel + Actions Row */}
-      <div className="flex flex-wrap justify-between items-center mt-3 gap-4 border-b pb-4">
-        {/* LEFT: Channel */}
+      {/* Channel + Actions */}
+      <div className="flex justify-between items-center mt-3">
         <div className="flex items-center gap-3">
           <img
-            src={
-              video.owner?.avatar ||
-              "https://via.placeholder.com/40"
-            }
-            className="w-10 h-10 rounded-full object-cover"
+            src={video.owner?.avatar}
+            className="w-10 h-10 rounded-full"
             alt=""
           />
 
           <div>
-            <p className="font-semibold text-left">
+            <p className="font-semibold">
               {video.owner?.username}
             </p>
             <p className="text-sm text-gray-500">
@@ -202,7 +240,6 @@ const VideoPage = () => {
             </p>
           </div>
 
-          {/* Subscribe */}
           <button
             onClick={toggleSubscribe}
             className={`ml-4 px-4 py-2 rounded-full text-white ${subscribed ? "bg-gray-500" : "bg-black"
@@ -212,35 +249,34 @@ const VideoPage = () => {
           </button>
         </div>
 
-        {/* RIGHT: Actions */}
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-3">
           <button
             onClick={toggleLike}
             className="px-4 py-2 bg-gray-200 rounded-full"
           >
-            {liked ? "👍 Liked" : "👍 Like"} ({likesCount})
+            👍 {likesCount}
           </button>
 
-          <button className="px-4 py-2 bg-gray-200 rounded-full">
+          <button
+            onClick={openPlaylistPopup}
+            className="px-4 py-2 bg-gray-200 rounded-full"
+          >
             ➕ Playlist
-          </button>
-
-          <button className="px-4 py-2 bg-gray-200 rounded-full">
-            🔗 Share
           </button>
         </div>
       </div>
 
       {/* Description */}
       <div className="bg-gray-100 rounded-xl p-4 mt-4">
-        <p className="text-sm text-gray-600 mb-2">
-          Uploaded on {formattedDate}
+        <p className="font-semibold text-sm mb-2 text-left">
+          {(video.views || 0).toLocaleString()} views •{" "}
+          {new Date(video.createdAt).toLocaleDateString()}
         </p>
 
-        <p>
+        <p className="whitespace-pre-line text-left">
           {showFullDesc
             ? video.description
-            : shortDescription}
+            : video.description?.slice(0, 150)}
         </p>
 
         {video.description?.length > 150 && (
@@ -253,67 +289,88 @@ const VideoPage = () => {
         )}
       </div>
 
+      {/* Add Comment */}
+      <div className="mt-6 flex gap-3">
+        <input
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add comment..."
+          className="flex-1 border rounded px-3 py-2"
+        />
+        <button
+          onClick={addComment}
+          className="px-4 bg-black text-white rounded"
+        >
+          Comment
+        </button>
+      </div>
+
       {/* Comments */}
-      <div className="mt-6">
-        <h2 className="font-semibold mb-3">
-          {comments.length} Comments
-        </h2>
+      <div className="space-y-4 mt-6">
+        {comments.map((c) => (
+          <div key={c._id} className="flex gap-3">
+            <img
+              src={
+                c.owner?.avatar ||
+                "https://via.placeholder.com/40"
+              }
+              className="w-10 h-10 rounded-full"
+              alt=""
+            />
 
-        {/* Add comment */}
-        <div className="flex gap-2 mb-4">
-          <input
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="flex-1 border rounded-full px-4 py-2"
-            placeholder="Add comment..."
-          />
+            <div className="flex-1 text-left">
+              <p className="font-semibold ">
+                {c.owner?.username}
+              </p>
 
-          <button
-            onClick={addComment}
-            className="bg-black text-white px-4 py-2 rounded-full"
-          >
-            Comment
-          </button>
-        </div>
+              <p>{c.content}</p>
 
-        {/* Comment list */}
-        <div className="space-y-4">
-          {comments.map((c) => (
-            <div key={c._id} className="flex gap-3">
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <div className="flex gap-4 mt-1 text-sm">
+                <button onClick={() => toggleCommentLike(c._id)}>
+                  👍 {c.likesCount || 0}
+                </button>
 
-              <div>
-                <p className="font-medium text-sm">
-                  {c.owner?.username}
-                </p>
-
-                <p className="text-sm">{c.content}</p>
-
-                <div className="flex gap-3 text-sm mt-1">
-                  <button
-                    onClick={() =>
-                      toggleCommentLike(c._id)
-                    }
-                  >
-                    👍 {c.likesCount || 0}
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      deleteComment(c._id)
-                    }
-                  >
-                    🗑 Delete
-                  </button>
-                </div>
+                <button
+                  onClick={() => deleteComment(c._id)}
+                  className="text-red-500"
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
+
+      {/* Playlist Popup */}
+      {showPlaylistPopup && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded w-80">
+            <h2 className="font-semibold mb-3">
+              Add to Playlist
+            </h2>
+
+            {playlists.map((p) => (
+              <button
+                key={p._id}
+                onClick={() => addToPlaylist(p._id)}
+                className="block w-full text-left py-2 hover:bg-gray-100 px-2 rounded"
+              >
+                {p.name}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setShowPlaylistPopup(false)}
+              className="mt-4 text-sm text-gray-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
-
 };
 
 export default VideoPage;

@@ -388,7 +388,12 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         },
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            if: {
+              $in: [
+                new mongoose.Types.ObjectId(req.user?._id),
+                "$subscribers.subscriber",
+              ],
+            },
             then: true,
             else: false,
           },
@@ -474,6 +479,31 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
+const addToWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId) {
+    throw new ApiError(400, "Video id missing");
+  }
+
+  // remove if already exists
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { watchHistory: videoId },
+  });
+
+  // add to start
+  await User.findByIdAndUpdate(req.user._id, {
+    $push: {
+      watchHistory: {
+        $each: [videoId],
+        $position: 0,
+      },
+    },
+  });
+
+  return res.status(200).json(new ApiResponse(200, {}, "History updated"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -486,4 +516,5 @@ export {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  addToWatchHistory,
 };
