@@ -140,9 +140,8 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid user credentials");
   }
 
-  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
-    user._id
-  );
+  const { accessToken, refreshToken: newRefreshToken } =
+    await generateAccessAndRefereshTokens(user._id);
 
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -151,7 +150,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: isInProduction ? true : false,
-    sameSite: isInProduction ? "None" : "lax",
+    sameSite: isInProduction ? "None" : "Lax",
   };
 
   console.log("cookiesstored");
@@ -159,14 +158,14 @@ const loginUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("refreshToken", newRefreshToken, options)
     .json(
       new ApiResponse(
         200,
         {
           user: loggedInUser,
           accessToken,
-          refreshToken,
+          refreshToken: newRefreshToken,
         },
         "User logged In Successfully"
       )
@@ -189,7 +188,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: isInProduction ? true : false,
-    sameSite: isInProduction ? "None" : "lax",
+    sameSite: isInProduction ? "None" : "Lax",
   };
 
   return res
@@ -226,7 +225,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: isInProduction ? true : false,
-      sameSite: isInProduction ? "None" : "lax",
+      sameSite: isInProduction ? "None" : "Lax",
     };
 
     const { accessToken, newRefreshToken } =
