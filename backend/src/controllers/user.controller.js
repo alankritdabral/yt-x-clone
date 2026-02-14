@@ -190,7 +190,6 @@ const logoutUser = asyncHandler(async (req, res) => {
     secure: isInProduction ? true : false,
     sameSite: isInProduction ? "None" : "Lax",
   };
-
   return res
     .status(200)
     .clearCookie("accessToken", options)
