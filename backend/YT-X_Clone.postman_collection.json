@@ -1,0 +1,240 @@
+{
+	"info": {
+		"_postman_id": "yt-x-clone-collection",
+		"name": "YT-X Clone API",
+		"description": "API Collection for YT-X Clone backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "fullName", "value": "John Doe", "type": "text" },
+								{ "key": "username", "value": "johndoe", "type": "text" },
+								{ "key": "email", "value": "john@example.com", "type": "text" },
+								{ "key": "password", "value": "password123", "type": "text" },
+								{ "key": "avatar", "type": "file", "src": "" },
+								{ "key": "coverImage", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/users/register",
+							"host": ["{{base_url}}"],
+							"path": ["users", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/users/login",
+							"host": ["{{base_url}}"],
+							"path": ["users", "login"]
+						}
+					}
+				},
+				{
+					"name": "Logout User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/logout",
+							"host": ["{{base_url}}"],
+							"path": ["users", "logout"]
+						}
+					}
+				},
+				{
+					"name": "Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/current-user",
+							"host": ["{{base_url}}"],
+							"path": ["users", "current-user"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Videos",
+			"item": [
+				{
+					"name": "Get All Videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/videos?page=1&limit=10&query=test&sortBy=createdAt&sortType=desc",
+							"host": ["{{base_url}}"],
+							"path": ["videos"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "query", "value": "test" },
+								{ "key": "sortBy", "value": "createdAt" },
+								{ "key": "sortType", "value": "desc" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Publish Video",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "title", "value": "My Video", "type": "text" },
+								{ "key": "description", "value": "Video Description", "type": "text" },
+								{ "key": "videoFile", "type": "file", "src": "" },
+								{ "key": "thumbnail", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/videos",
+							"host": ["{{base_url}}"],
+							"path": ["videos"]
+						}
+					}
+				},
+				{
+					"name": "Get Video By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/videos/:videoId",
+							"host": ["{{base_url}}"],
+							"path": ["videos", ":videoId"],
+							"variable": [{ "key": "videoId", "value": "" }]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tweets",
+			"item": [
+				{
+					"name": "Create Tweet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Hello World!\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/tweets",
+							"host": ["{{base_url}}"],
+							"path": ["tweets"]
+						}
+					}
+				},
+				{
+					"name": "Get Feed Tweets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{base_url}}/tweets",
+							"host": ["{{base_url}}"],
+							"path": ["tweets"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Likes",
+			"item": [
+				{
+					"name": "Toggle Video Like",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"url": {
+							"raw": "{{base_url}}/likes/toggle/v/:videoId",
+							"host": ["{{base_url}}"],
+							"path": ["likes", "toggle", "v", ":videoId"],
+							"variable": [{ "key": "videoId", "value": "" }]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Add Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Nice video!\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/comments/:videoId",
+							"host": ["{{base_url}}"],
+							"path": ["comments", ":videoId"],
+							"variable": [{ "key": "videoId", "value": "" }]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": { "type": "text/javascript", "exec": [""] }
+		},
+		{
+			"listen": "test",
+			"script": { "type": "text/javascript", "exec": [""] }
+		}
+	],
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000/api/v1", "type": "string" },
+		{ "key": "access_token", "value": "", "type": "string" }
+	]
+}
