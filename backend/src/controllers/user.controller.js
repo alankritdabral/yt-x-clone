@@ -163,8 +163,6 @@ const loginUser = asyncHandler(async (req, res) => {
     sameSite: isInProduction ? "None" : "Lax",
   };
 
-  console.log("cookiesstored");
-
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
@@ -222,21 +220,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    console.log("Decoded Token:", decodedToken);
-
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      console.log("User not found for token:", decodedToken?._id);
       throw new ApiError(401, "Invalid refresh token");
     }
 
-    console.log("Found user:", user.email);
-    console.log("Incoming RT:", incomingRefreshToken);
-    console.log("Stored RT:", user.refreshToken);
-
     if (incomingRefreshToken !== user?.refreshToken) {
-      console.log("RT Mismatch!");
       throw new ApiError(401, "Refresh token is expired or used");
     }
 

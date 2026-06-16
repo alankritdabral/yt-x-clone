@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Like } from "../models/like.models.js";
 import { View } from "../models/view.models.js";
+import { Subscription } from "../models/subscription.models.js";
 
 /* =======================
    GET ALL VIDEOS (PUBLIC)
@@ -93,17 +94,28 @@ const getVideoById = asyncHandler(async (req, res) => {
   const likesCount = await Like.countDocuments({ video: video._id });
 
   let isLiked = false;
+  let isSubscribed = false;
+
   if (req.user) {
     const liked = await Like.findOne({
       video: video._id,
       likedBy: req.user._id,
     });
     isLiked = !!liked;
+
+    if (video.owner) {
+      const sub = await Subscription.findOne({
+        subscriber: req.user._id,
+        channel: video.owner._id,
+      });
+      isSubscribed = !!sub;
+    }
   }
 
   const result = video.toObject();
   result.likesCount = likesCount;
   result.isLiked = isLiked;
+  result.isSubscribed = isSubscribed;
 
   res.status(200).json(new ApiResponse(200, result, "Video fetched"));
 });

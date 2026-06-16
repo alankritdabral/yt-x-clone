@@ -9,14 +9,14 @@ import {
   registerView,
 } from "../controllers/video.controller.js";
 
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyJWTSoft } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 /* PUBLIC ROUTES */
 router.get("/", getAllVideos);
-router.get("/:videoId", getVideoById);
+router.get("/:videoId", verifyJWTSoft, getVideoById);
 
 /* PRIVATE ROUTES */
 router.post(

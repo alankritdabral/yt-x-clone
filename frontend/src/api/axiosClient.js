@@ -1,7 +1,7 @@
 // API configuration and instance setup
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1/'
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 10000
 
 // Create axios instance with default config
@@ -29,30 +29,60 @@ apiClient.interceptors.request.use(
 )
 
 // Response interceptor - Handle token refresh and errors
+let refreshTokenPromise = null;
+
+export const refreshAccessToken = async () => {
+  if (refreshTokenPromise) return refreshTokenPromise;
+
+  refreshTokenPromise = (async () => {
+    try {
+      const url = `${API_BASE_URL.replace(/\/$/, '')}/users/refresh-token`;
+      
+      const response = await axios.post(
+        url,
+        {},
+        { withCredentials: true }
+      );
+      const { accessToken, user } = response.data.data;
+      
+      localStorage.setItem("accessToken", accessToken);
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+      
+      apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      return { accessToken, user };
+    } catch (error) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/register") {
+        window.location.href = "/login";
+      }
+      throw error;
+    } finally {
+      refreshTokenPromise = null;
+    }
+  })();
+
+  return refreshTokenPromise;
+};
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle token refresh on 401
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry && 
+      !originalRequest.url.includes('refresh-token')
+    ) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post(
-          `${API_BASE_URL}users/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-        
-        const { accessToken } = response.data.data;
-        localStorage.setItem("accessToken", accessToken);
-        
+        const { accessToken } = await refreshAccessToken();
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return axios(originalRequest);
+        return apiClient(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }

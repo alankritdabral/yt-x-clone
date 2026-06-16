@@ -5,12 +5,12 @@ import {
   getVideoComments,
   updateComment,
 } from "../controllers/comment.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyJWTSoft } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 /* ---------- Public ---------- */
-router.get("/:videoId", getVideoComments);
+router.get("/:videoId", verifyJWTSoft, getVideoComments);
 
 /* ---------- Protected ---------- */
 router.post("/:videoId", verifyJWT, addComment);
