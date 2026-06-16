@@ -42,7 +42,6 @@ const VideoPage = () => {
 
   const [showPlaylistPopup, setShowPlaylistPopup] = useState(false);
   const [playlists, setPlaylists] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
   /* ---------------- Fetch Data ---------------- */
@@ -50,7 +49,7 @@ const VideoPage = () => {
     const fetchData = async () => {
       try {
         const storedUser = localStorage.getItem("user");
-        if (!storedUser) setIsLoggedIn(false);
+        const userLoggedIn = !!storedUser;
 
         const videoInfo = await fetchVideo(videoId);
 
@@ -70,7 +69,7 @@ const VideoPage = () => {
         }
 
         setComments(await fetchComments(videoId));
-        if (isLoggedIn) {
+        if (userLoggedIn) {
           await fetch(`${API}/users/history/${videoId}`, {
             method: "POST",
             credentials: "include",

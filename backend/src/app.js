@@ -42,6 +42,18 @@ app.use("/api/v1/playlist", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/search", searchRoutes);
 
+// Error handler
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    errors: err.errors || [],
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+});
+
 // http://localhost:8000/api/v1/users/register
 
 export { app };

@@ -8,7 +8,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true, // ✅ FIX spelling
+      lowercase: true, 
       trim: true,
       index: true,
     },
@@ -16,7 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true, // ✅ FIX spelling
+      lowercase: true, 
       trim: true,
     },
     fullName: {
@@ -52,11 +52,20 @@ const userSchema = new Schema(
 // ✅ FIXED: async hook without next()
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
+
+  console.log("Hashing password for user:", this.email);
   this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
+  if (!password || !this.password) {
+    console.log("isPasswordCorrect: Missing password or hash");
+    return false;
+  }
+  console.log("isPasswordCorrect: Comparing. Input length:", password.length, "Stored hash length:", this.password.length);
+  const isMatch = await bcrypt.compare(password, this.password);
+  console.log("isPasswordCorrect: Match result:", isMatch);
+  return isMatch;
 };
 
 userSchema.methods.generateAccessToken = function () {
